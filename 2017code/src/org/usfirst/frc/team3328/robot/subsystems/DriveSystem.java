@@ -18,7 +18,9 @@ public interface DriveSystem {
 	//the speed of each side is separately adjusted using the displacement
 	void autoAngle(double speed, double current, double desired);
 	
-	void track(double offset);
+	void track();
+	
+	boolean isTracking();
 	
 	void move(double left, double right);
 
