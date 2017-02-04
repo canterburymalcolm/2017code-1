@@ -1,5 +1,6 @@
 package org.usfirst.frc.team3328.robot.subsystems;
 
+import org.usfirst.frc.team3328.robot.networking.Target;
 import org.usfirst.frc.team3328.robot.utilities.Controller;
 import org.usfirst.frc.team3328.robot.utilities.DriveEncoders;
 import org.usfirst.frc.team3328.robot.utilities.DriveTalons;
@@ -8,25 +9,33 @@ import edu.wpi.first.wpilibj.SpeedController;
 
 public class SteamWorksDriveSystem implements DriveSystem {
 	
-	Controller con;
+	Controller driveXbox;
+	Controller utilXbox;
 	private DriveTalons talons;
 	private DriveEncoders encoders;
 	private double restraint = 1;
 	private double factor = 1.1;
 	private double displacement;
 	private double speed;
-	private boolean active = true;
+	private double pixel;
+	private double trackSpeed = 0.08;
+	private boolean tracking = false;
+	Target target;
 	
 	//instantiates talons assigns controller to "con"
-	public SteamWorksDriveSystem(DriveEncoders driveEncoders, DriveTalons driveTalons, Controller controller){
+	public SteamWorksDriveSystem(DriveEncoders driveEncoders, DriveTalons driveTalons,
+								 Controller Controller1, Controller Controller2, Target targetPixelValue){
 		encoders = driveEncoders;
 		talons = driveTalons;
-		con = controller;
+		driveXbox = Controller1;
+		utilXbox = Controller2;
+		target = targetPixelValue;
+		
 	}
 	
 	@Override
 	public double getSpeed(){
-		speed = ((con.getX() + con.getY()) / restraint) * 10;
+		speed = ((driveXbox.getX() + driveXbox.getY()) / restraint) * 10;
 		speed = (speed * speed) / 100;
 		return speed;
 	}
@@ -47,10 +56,10 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	
 	//Dynamic updating for strength of angle correction during auto
 	private void updateFactor(){
-		if (con.getButtonRelease(1) && factor > 1){
+		if (driveXbox.getButtonRelease(1) && factor > 1){
 			factor -= .1;
 		}
-		if (con.getButtonRelease(2) && factor < 10){
+		if (driveXbox.getButtonRelease(2) && factor < 10){
 			factor += .1;
 		}
 	}
@@ -59,21 +68,12 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	//the left and right bumpers lower and raise "restraint" respectively
 	//"restraint" is confined between 10 & 1
 	private void restrain(){
-		if (con.getButtonRelease(5) && restraint > 1){
+		if (driveXbox.getButtonRelease(5) && restraint > 1){
 			restraint -= 1;
 		}
-		if (con.getButtonRelease(6) && restraint < 10){
+		if (driveXbox.getButtonRelease(6) && restraint < 10){
 			restraint += 1;
 		}
-	}
-	
-	//toggles drive off and the climb system on because they share controlls
-	private boolean driveActive(){
-		if (con.getButtonRelease(1)){
-			active = !active;
-			System.out.println("driveMode: " + active);
-		}
-		return active;
 	}
 	
 	//gets displacement between the desired angle and the current angle
@@ -101,33 +101,47 @@ public class SteamWorksDriveSystem implements DriveSystem {
 		talons.left((speed - displacement) * factor);
 	}
 	
-	//takes a pixel offset to aim the robot
-	//turns until it's within a 4 pixel range of target
-	//turns at .2 if >50, .1 if < 50
+	//toggles tracking if the left bumper is pressed
+	//disables tracking if aligned
+	//returns true if tracking
 	@Override
-	public void track(double pixel){
-		double sp = .08;
+	public boolean isTracking(){
+		if (pixel < 350 && pixel > 290){
+			tracking = false;
+		}
+		if (utilXbox.getButtonRelease(5)){
+			tracking = !tracking;
+		}
+		return tracking;
+	}	
+	
+	//takes a pixel offset to aim the robot
+	//turns until it's within a specified dead zone
+	//turns at trackSpeed if outside of dead zone
+	@Override
+	public void track(){
 		if (pixel > 350){
-			move(sp, -sp);
+			move(trackSpeed, -trackSpeed);
 		}else if (pixel < 290){
-			move(-sp, sp);
+			move(-trackSpeed, trackSpeed);
 		}else{
 			talons.stop();
 		}
 	}
 	
-	
 	//updates the value of "restraint"
+	//updates tracking, if tracking then it continues to track
 	//sets each motor to the appropriate speed adjusted by the restraint
 	@Override
 	public void controlledMove(){
-		if (driveActive()){
+		if (!isTracking()){
+			pixel = target.getPixel();
 			restrain();
-			move((con.getX() + con.getY()) / restraint, 
-				(con.getX() - con.getY()) / restraint);
+			move((driveXbox.getX() + driveXbox.getY()) / restraint, 
+				(driveXbox.getX() - driveXbox.getY()) / restraint);
 		}else{
-			talons.stop();
+			track();
 		}
 	}
-	
+
 }
