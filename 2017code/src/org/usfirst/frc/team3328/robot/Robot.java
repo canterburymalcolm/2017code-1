@@ -68,7 +68,7 @@ public class Robot extends IterativeRobot {
 		beltControl = new Talon(8);
 		driveXbox = new SteamWorksXbox(0);
 		utilXbox = new SteamWorksXbox(1);
-		drive = new SteamWorksDriveSystem(driveEncoders, driveTalons, driveXbox);
+		drive = new SteamWorksDriveSystem(driveEncoders, driveTalons, driveXbox, utilXbox, target);
 		climb = new SteamWorksClimber(climbControl, utilXbox);
 		feed = new SteamWorksFeeder(feedControl, utilXbox);
 		shoot = new SteamWorksShooter(shootEncoder, shootControl1, shootControl2, utilXbox);
@@ -91,11 +91,9 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		/*drive.controlledMove();
-		drive.printSpeed();*/
-		//target.printValues();
-		drive.track(target.getPixel());
+		drive.controlledMove();
 		drive.printSpeed();
+		//target.printValues();
 		
 	}
 
