@@ -43,6 +43,10 @@ public class SteamWorksShooter implements Shooter {
 		t2.set(0);
 	}
 
+	private void isTrack(){
+		
+	}
+	
 	// Method to check whether the button
 	// is pressed and sets the talons to
 	// max speed whether or not.
