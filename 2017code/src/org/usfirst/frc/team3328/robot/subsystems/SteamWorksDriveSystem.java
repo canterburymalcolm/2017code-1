@@ -34,6 +34,15 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	}
 	
 	@Override
+	public double getDistance(){
+		return (encoders.frDistance() + encoders.blDistance()) / 2;
+	}
+	
+	public void resetDistance(){
+		encoders.reset();
+	}
+	
+	@Override
 	public double getSpeed(){
 		speed = ((driveXbox.getX() + driveXbox.getY()) / restraint) * 10;
 		speed = (speed * speed) / 100;
