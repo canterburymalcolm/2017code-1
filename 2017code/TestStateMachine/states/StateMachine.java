@@ -2,11 +2,16 @@ package states;
 
 import java.util.*;
 
+import org.usfirst.frc.team3328.robot.subsystems.DriveSystem;
+import org.usfirst.frc.team3328.robot.subsystems.HotelLobby;
+import org.usfirst.frc.team3328.robot.subsystems.Shooter;
+import org.usfirst.frc.team3328.robot.utilities.IMU;
+
 public class StateMachine {
 	
 	Map<States, RobotState> classes = new HashMap<>();
-	public enum States {START, TURN, MOVE, TRACKSHOT, SHOOT, STOP};
-	public enum Goals {SHOOT, LINE, NOTHING};
+	public enum States {START, TURN, MOVE, TRACKSHOT, SHOOT, TRACKGEAR, GEAR, STOP};
+	public enum Goals {SHOOT, LINE, GEAR, NOTHING};
 	public enum Pos {FL, FM, FR, BL, BM, BR};
 	double currentAng;
 	double desiredAng;
@@ -16,13 +21,30 @@ public class StateMachine {
 	Pos pos;
 	States state;
 	States prevState;
+	DriveSystem drive;
+	Shooter shooter;
+	HotelLobby belt;
+	IMU imu;
 	Start start = new Start(goal, pos);
-	Move move = new Move(goal, pos);
-	Turn turn = new Turn(goal, pos);
-	Shoot shoot = new Shoot(goal, pos);
-	Stop stop = new Stop();
+	Move move = new Move(goal, pos, drive);
+	Turn turn = new Turn(goal, pos, drive, imu);
+	TrackShot trackShot = new TrackShot(drive);
+	Shoot shoot = new Shoot(goal, pos, shooter, belt);
+	TrackGear trackGear = new TrackGear();
+	Gear gear = new Gear();
+	Stop stop = new Stop(drive, shooter);
+	private final double LINELONG = 5;
+	private final double LINESHORT = 2;
+	private final double SHOOTLONG = 10;
+	private final double SHOOTMIDDLE = 5;
+	private final double SHOOTSHORT = 2;
+	private final double SHOOTFINAL = 1;
+	private final double GEARLONG = 6;
+	private final double GEARMIDDLE = 3;
+	private final double GEARSHORT = 1;
 	
-	public StateMachine(int mode){
+	
+	public StateMachine(int mode, DriveSystem dr, Shooter sh, IMU ADIS, HotelLobby lobby){
 		switch (mode){
 			case 0:
 				goal = Goals.SHOOT;
@@ -76,17 +98,48 @@ public class StateMachine {
 				goal = Goals.NOTHING;
 				pos = Pos.FL;
 				break;
+			case 13:
+				goal = Goals.GEAR;
+				pos = Pos.FL;
+				break;
+			case 14:
+				goal = Goals.GEAR;
+				pos = Pos.FM;
+				break;
+			case 15:
+				goal = Goals.GEAR;
+				pos = Pos.FR;
+				break;
+			case 16:
+				goal = Goals.GEAR;
+				pos = Pos.BL;
+				break;
+			case 17:
+				goal = Goals.GEAR;
+				pos = Pos.BM;
+				break;
+			case 18:
+				goal = Goals.GEAR;
+				pos = Pos.BR;
+				break;
 			default:
 				goal = Goals.NOTHING;
 				pos = Pos.FL;
 		}
+		drive = dr;
+		shooter = sh;
+		imu = ADIS;
+		belt = lobby;
 	}
 	
 	public void createMap(){
 		classes.put(States.START, start);
 		classes.put(States.MOVE, move);
 		classes.put(States.TURN, turn);
+		classes.put(States.TRACKSHOT, trackShot);
 		classes.put(States.SHOOT, shoot);
+		classes.put(States.TRACKGEAR, trackGear);
+		classes.put(States.GEAR, gear);
 		classes.put(States.STOP, stop);
 	}
 	
@@ -97,48 +150,64 @@ public class StateMachine {
 				break;
 			case LINE:
 				if (move.distance == -1){
-					if (pos == Pos.FL || pos == Pos.FR){
+					if (pos == Pos.FL || pos == Pos.FR || pos == Pos.BR || pos == Pos.BL){
 						if (iteration == 1){
-							move.distance = 5;
+							move.distance = LINELONG;
 						}
-					}else if (pos == Pos.FM){
+					}else if (pos == Pos.FM || pos == Pos.BM){
 						if (iteration == 2){
-							move.distance = 2;
+							move.distance = LINESHORT;
 						}
 						if (iteration == 4){
-							move.distance = 5;
+							move.distance = LINELONG;
 						}
 					}
 				}
 				break;
 			case SHOOT:
 				if (move.distance == -1){
-					if (pos == Pos.FL){
+					if (pos == Pos.FL || pos == Pos.BR){
 						if (iteration == 2){
-							move.distance = 10;
+							move.distance = SHOOTLONG;
 						}
 						if (iteration == 4){
-							move.distance = 2;
+							move.distance = SHOOTSHORT;
 						}
 						if (iteration == 6){
-							move.distance = 1;
+							move.distance = SHOOTFINAL;
 						}
-					}else if (pos == Pos.FM){
+					}else if (pos == Pos.FM || pos == Pos.BM){
 						if (iteration == 2){
-							move.distance = 5;
+							move.distance = SHOOTMIDDLE;
 						}
 						if (iteration == 4){
-							move.distance = 2;
+							move.distance = SHOOTSHORT;
 						}
 						if (iteration == 6){
-							move.distance = 1;
+							move.distance = SHOOTFINAL;
 						}
-					}else if (pos == Pos.FR){
+					}else if (pos == Pos.FR || pos == Pos.BL){
 						if (iteration == 1){
-							move.distance = 5;
+							move.distance = SHOOTSHORT;
 						}
 						if (iteration == 3){
-							move.distance = 1;
+							move.distance = SHOOTFINAL;
+						}
+					}
+				}
+				break;
+			case GEAR:
+				if (move.distance == -1){
+					if (pos == Pos.FL || pos == Pos.BR || pos == Pos.FR || pos == Pos.BL){
+						if (iteration == 1){
+							move.distance = GEARLONG;
+						}
+						if (iteration == 3){
+							move.distance = GEARSHORT;
+						}
+					}else if (pos == Pos.FM || pos == Pos.BM){
+						if (iteration == 1){
+							move.distance = GEARMIDDLE;
 						}
 					}
 				}
@@ -155,9 +224,9 @@ public class StateMachine {
 				break;
 			case LINE:
 				if (turn.desired == 400){
-					if (pos == Pos.FL || pos == Pos.FR){
+					if (pos == Pos.FL || pos == Pos.FR || pos == Pos.BR || pos == Pos.BL){
 						turn.desired = 0;
-					}else if (pos == Pos.FM){
+					}else if (pos == Pos.FM || pos == Pos.BM){
 						if (iteration == 1){
 							turn.desired = turn.current + 90;
 						}
@@ -169,7 +238,7 @@ public class StateMachine {
 				break;
 			case SHOOT:
 				if (turn.desired == 400){
-					if (pos == Pos.FL || pos == Pos.FM){
+					if (pos == Pos.FL || pos == Pos.FM || pos == Pos.BR || pos == Pos.BM){
 						if (iteration == 1){
 							turn.desired = turn.current + 90;
 						}
@@ -179,10 +248,25 @@ public class StateMachine {
 						if (iteration == 5){
 							turn.desired = turn.current + 90;
 						}
-					}else if (pos == Pos.FR){
+					}else if (pos == Pos.FR || pos == Pos.BL){
 						if (iteration == 2){
 							turn.desired = turn.current + 90;
 						}
+					}
+				}
+				break;
+			case GEAR:
+				if (turn.desired == 400){
+					if (pos == Pos.FL || pos == Pos.BR){
+						if (iteration == 2){
+							turn.desired = turn.current + 90;
+						}
+					}else if(pos == Pos.FR || pos == Pos.BL){
+						if (iteration == 2){
+							turn.desired = turn.current - 90;
+						}
+					}else if(pos == Pos.FM || pos == Pos.BM){
+						turn.desired = 0;
 					}
 				}
 				break;
@@ -207,6 +291,7 @@ public class StateMachine {
 			updateAngles();
 			state = classes.get(state).run();
 			if (prevState != state){
+				drive.resetDistance();
 				iteration++;
 			}
 			prevState = state;
