@@ -3,15 +3,22 @@ package org.usfirst.frc.team3328.robot.subsystems;
 import edu.wpi.first.wpilibj.SpeedController;
 
 public class SteamWorksHotelLobby implements HotelLobby {
-
-	public SteamWorksHotelLobby(SpeedController talonController) {
-		// TODO Auto-generated constructor stub
+	
+	Shooter shooter;
+	SpeedController belt;
+	
+	public SteamWorksHotelLobby(SpeedController talonController, Shooter sh) {
+		shooter = sh;
+		belt = talonController;
 	}
 	
 	@Override
 	public void controlBelt() {
-		// TODO Auto-generated method stub
-
+		if (shooter.isMax()){
+			belt.set(1);
+		}else{
+			belt.set(0);
+		}
 	}
 
 }
