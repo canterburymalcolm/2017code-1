@@ -21,6 +21,12 @@ public class SteamWorksShooter implements Shooter {
 	}
 	
 	@Override
+	public boolean isEmpty(){
+		//returns true if hotel is empty
+		return false;
+	}
+	
+	@Override
 	public boolean isMax(){
 		return coder.get() >= 1000;
 	}
