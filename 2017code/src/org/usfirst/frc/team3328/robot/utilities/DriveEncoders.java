@@ -16,6 +16,13 @@ public class DriveEncoders {
 		bl = new Encoder(3,3);
 	}
 	
+	public void reset(){
+		fr.reset();
+		fl.reset();
+		br.reset();
+		bl.reset();
+	}
+	
 	public double frRate(){
 		return fr.getRate();
 	}
