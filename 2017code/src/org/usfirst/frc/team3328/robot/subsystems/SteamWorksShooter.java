@@ -1,24 +1,22 @@
 package org.usfirst.frc.team3328.robot.subsystems;
 
 import org.usfirst.frc.team3328.robot.utilities.Controller;
+import org.usfirst.frc.team3328.robot.utilities.ShooterTalons;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.SpeedController;
 
 public class SteamWorksShooter implements Shooter {
 
+	
 	Encoder coder;
-	SpeedController t1;
-	SpeedController t2;
+	ShooterTalons talons;
 	Controller con;
 	private double speed = 0;
 	boolean active = false;
 	
-	public SteamWorksShooter(Encoder encoder, SpeedController talonController1,
-							 SpeedController talonController2, Controller controller){
+	public SteamWorksShooter(Encoder encoder, ShooterTalons talonController, Controller controller){
 		coder = encoder;
-		t1 = talonController1;
-		t2 = talonController2;
+		talons = talonController;
 		con = controller;
 	}
 	
@@ -27,25 +25,22 @@ public class SteamWorksShooter implements Shooter {
 		return coder.get() >= 1000;
 	}
 	
-	// Gradually builds up speed to max 
-	private void maxSpeed(){
+	// Gradually builds up speed to max
+	@Override
+	public void maxSpeed(){
 		if (speed < 1){
 			speed += 0.02;
 		}
-		t1.set(speed);
-		t2.set(speed);
+		talons.set(speed);
 	}
 	
 	// Sets talons and speed to 0
-	private void stop(){
+	@Override
+	public void stop(){
 		speed = 0;
-		t1.set(0);
-		t2.set(0);
+		talons.stop();
 	}
-
-	private void isTrack(){
-		
-	}
+	
 	
 	// Method to check whether the button
 	// is pressed and sets the talons to
