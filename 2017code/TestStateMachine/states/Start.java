@@ -15,31 +15,26 @@ public class Start implements RobotState{
 	
 	@Override
 	public States run(){
-		if (goal == Goals.NOTHING){
-			return States.STOP;
-		}
-		switch (pos){
-			case  FL:
-				if (goal == Goals.LINE){
-					state = States.MOVE;
-				}else{
-					state = States.TURN;
-				}
-				break;
-			case FM:
-				state = States.TURN;
-				break;
-			case FR:
-				if (goal == Goals.LINE){
-					state = States.MOVE;
-				}else{
-					state = States.TURN;
-				}
-				break;
+		switch(goal){
+			case NOTHING:
+				return States.STOP;
+			case LINE:
+				 if (pos == Pos.FM || pos == Pos.BM){
+					 return States.TURN;
+				 }else{
+					 return States.MOVE;
+				 }
+			case SHOOT:
+				 if (pos == Pos.FL || pos == Pos.FM || pos == Pos.BR || pos == Pos.BM){
+					 return States.TURN;
+				 }else{
+					 return States.MOVE;
+				 }
+			case GEAR:
+				return States.MOVE;
 			default:
-				state = States.STOP;
+				return States.STOP;
 		}
-		return state;	
 	}
 	
 }
