@@ -1,7 +1,11 @@
 package org.usfirst.frc.team3328.robot.subsystems;
 
 public interface DriveSystem {
-
+	
+	double getDistance();
+	
+	void resetDistance();
+	
 	//formats and prints the value that the speed controllers are receiving.
 	void printSpeed();
 	
