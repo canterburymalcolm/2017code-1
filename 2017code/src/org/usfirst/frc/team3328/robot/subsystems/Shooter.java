@@ -4,6 +4,10 @@ public interface Shooter {
 
 	boolean isMax();
 	
+	void maxSpeed();
+	
+	void stop();
+	
 	void shooterControl();
 
 }
