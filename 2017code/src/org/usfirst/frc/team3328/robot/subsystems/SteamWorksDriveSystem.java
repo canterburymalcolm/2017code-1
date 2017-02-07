@@ -4,8 +4,7 @@ import org.usfirst.frc.team3328.robot.networking.Target;
 import org.usfirst.frc.team3328.robot.utilities.Controller;
 import org.usfirst.frc.team3328.robot.utilities.DriveEncoders;
 import org.usfirst.frc.team3328.robot.utilities.DriveTalons;
-
-import edu.wpi.first.wpilibj.SpeedController;
+import org.usfirst.frc.team3328.robot.utilities.SteamWorksXbox.Buttons;
 
 public class SteamWorksDriveSystem implements DriveSystem {
 	
@@ -65,10 +64,10 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	
 	//Dynamic updating for strength of angle correction during auto
 	private void updateFactor(){
-		if (driveXbox.getButtonRelease(1) && factor > 1){
+		if (driveXbox.getButtonRelease(Buttons.A) && factor > 1){
 			factor -= .1;
 		}
-		if (driveXbox.getButtonRelease(2) && factor < 10){
+		if (driveXbox.getButtonRelease(Buttons.B) && factor < 10){
 			factor += .1;
 		}
 	}
@@ -77,10 +76,10 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	//the left and right bumpers lower and raise "restraint" respectively
 	//"restraint" is confined between 10 & 1
 	private void restrain(){
-		if (driveXbox.getButtonRelease(5) && restraint > 1){
+		if (driveXbox.getButtonRelease(Buttons.LBUMP) && restraint > 1){
 			restraint -= 1;
 		}
-		if (driveXbox.getButtonRelease(6) && restraint < 10){
+		if (driveXbox.getButtonRelease(Buttons.RBUMP) && restraint < 10){
 			restraint += 1;
 		}
 	}
@@ -118,7 +117,7 @@ public class SteamWorksDriveSystem implements DriveSystem {
 		if (pixel < 350 && pixel > 290){
 			tracking = false;
 		}
-		if (utilXbox.getButtonRelease(5)){
+		if (utilXbox.getButtonRelease(Buttons.LBUMP)){
 			tracking = !tracking;
 		}
 		return tracking;
