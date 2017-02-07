@@ -1,6 +1,7 @@
 package org.usfirst.frc.team3328.robot.subsystems;
 
 import org.usfirst.frc.team3328.robot.utilities.Controller;
+import org.usfirst.frc.team3328.robot.utilities.SteamWorksXbox.Buttons;
 
 import edu.wpi.first.wpilibj.SpeedController;
 
@@ -18,7 +19,7 @@ public class SteamWorksFeeder implements Feeder{
 	//Toggles feeder on and off when A and B is pressed
 	@Override
 	public void controlFeeder() {
-		if (xbox.getButtonRelease(1) || xbox.getButtonRelease(2)){
+		if (xbox.getButtonRelease(Buttons.A) || xbox.getButtonRelease(Buttons.B)){
 			if (active) {
 				feeder.set(0);
 			}else{
