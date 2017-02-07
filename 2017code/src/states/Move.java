@@ -20,7 +20,8 @@ public class Move implements RobotState{
 	
 	@Override
 	public States run() {
-		distanceTraveled = drive.getDistance();
+		System.out.println("moving");
+		distanceTraveled += .01;
 		if (distanceTraveled < distance){
 			drive.move(.2, .2);
 			return States.MOVE;
