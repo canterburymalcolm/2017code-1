@@ -13,9 +13,9 @@ public class Turn implements RobotState{
 	IMU imu;
 	Goals goal;
 	Pos pos;
-	double range;
+	double range = .5;
 	double current;
-	double desired;
+	double desired = 400;
 	double iteration = 0;
 	
 	public Turn(Goals gl, Pos position, DriveSystem dr, IMU ADIS){
@@ -35,6 +35,7 @@ public class Turn implements RobotState{
 	
 	@Override
 	public States run() {
+		System.out.println("turning");
 		if (!inRange()){
 			drive.autoAngle(0, current, desired);
 			return States.TURN;
