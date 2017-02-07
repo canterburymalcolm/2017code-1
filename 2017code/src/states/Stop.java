@@ -18,7 +18,8 @@ public class Stop implements RobotState{
 	@Override
 	public States run() {
 		drive.move(0, 0);
-		shooter.stop();
+		//shooter.stop();
+		System.out.println("stopped");
 		return States.STOP;
 	}
 
