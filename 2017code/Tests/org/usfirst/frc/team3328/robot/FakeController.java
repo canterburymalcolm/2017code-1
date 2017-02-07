@@ -1,6 +1,7 @@
 package org.usfirst.frc.team3328.robot;
 
 import org.usfirst.frc.team3328.robot.utilities.Controller;
+import org.usfirst.frc.team3328.robot.utilities.SteamWorksXbox.Buttons;
 
 public class FakeController implements Controller {
 
@@ -28,13 +29,15 @@ public class FakeController implements Controller {
 	}
 	
 	@Override
-	public boolean getButtonRelease(int num) {
+	public boolean getButtonRelease(Buttons but) {
+		int num = but.value;
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean getButtonPress(int num) {
+	public boolean getButtonPress(Buttons but) {
+		int num = but.value;
 		// TODO Auto-generated method stub
 		return false;
 	}

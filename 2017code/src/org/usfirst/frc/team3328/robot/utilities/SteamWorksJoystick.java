@@ -1,5 +1,7 @@
 package org.usfirst.frc.team3328.robot.utilities;
 
+import org.usfirst.frc.team3328.robot.utilities.SteamWorksXbox.Buttons;
+
 import edu.wpi.first.wpilibj.Joystick;
 
 public class SteamWorksJoystick implements Controller {
@@ -28,7 +30,8 @@ public class SteamWorksJoystick implements Controller {
 	
 	//returns true when the button with the index "num" has been released
 	@Override
-	public boolean getButtonRelease(int num){
+	public boolean getButtonRelease(Buttons but){
+		int num = but.value;
 		if (joy.getRawButton(num) &&  !button[num]){
 			button[num] = joy.getRawButton(num);
 			return true;
@@ -39,7 +42,8 @@ public class SteamWorksJoystick implements Controller {
 	
 	//return true when button "num" 
 	@Override
-	public boolean getButtonPress(int num){
+	public boolean getButtonPress(Buttons but){
+		int num = but.value;
 		return joy.getRawButton(num);
 	}
 

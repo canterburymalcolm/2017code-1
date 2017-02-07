@@ -1,5 +1,7 @@
 package org.usfirst.frc.team3328.robot.utilities;
 
+import org.usfirst.frc.team3328.robot.utilities.SteamWorksXbox.Buttons;
+
 public interface Controller {
 
 	//returns the x axis value for the joystick
@@ -11,8 +13,8 @@ public interface Controller {
 	double getY();
 
 	//returns true when the button with the index "num" has been released
-	boolean getButtonRelease(int num);
+	boolean getButtonRelease(Buttons but);
 
-	boolean getButtonPress(int num);
+	boolean getButtonPress(Buttons but);
 
 }

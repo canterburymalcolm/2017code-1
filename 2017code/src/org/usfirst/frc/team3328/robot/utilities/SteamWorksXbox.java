@@ -8,9 +8,16 @@ public class SteamWorksXbox implements Controller {
 	//array to store previous value of buttons
 	boolean[] button = new boolean[10];
 	
+	public enum Buttons {A(1), B(2), X(3), Y(4), LBUMP(5), RBUMP(6); 
+		public int value;
+		Buttons(int value) {
+			this.value = value;
+		}
+	}
+	
 	//instantiates an xbox controller
 	public SteamWorksXbox(int channel){
-			xbox = new XboxController(channel);
+		xbox = new XboxController(channel);
 	}
 	
 	//returns the right trigger minus the left trigger to allow for forwards and reverse
@@ -30,7 +37,8 @@ public class SteamWorksXbox implements Controller {
 	
 	//returns true when the button with the index "num" has been released
 	@Override
-	public boolean getButtonRelease(int num){
+	public boolean getButtonRelease(Buttons but){
+		int num = but.value;
 		if (xbox.getRawButton(num) &&  !button[num]){
 			button[num] = xbox.getRawButton(num);
 			return true;
@@ -41,7 +49,8 @@ public class SteamWorksXbox implements Controller {
 	
 	//returns true while the button is pressed not when released
 	@Override
-	public boolean getButtonPress(int num){
+	public boolean getButtonPress(Buttons but){
+		int num = but.value;
 		return xbox.getRawButton(num);
 	}
 	
