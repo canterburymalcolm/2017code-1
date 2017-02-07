@@ -25,19 +25,19 @@ public class StateMachine {
 	Shooter shooter;
 	HotelLobby belt;
 	IMU imu;
-	Start start = new Start(goal, pos);
-	Move move = new Move(goal, pos, drive);
-	Turn turn = new Turn(goal, pos, drive, imu);
-	TrackShot trackShot = new TrackShot(drive);
-	Shoot shoot = new Shoot(goal, pos, shooter, belt);
-	TrackGear trackGear = new TrackGear();
-	Gear gear = new Gear();
-	Stop stop = new Stop(drive, shooter);
+	Start start;
+	Move move;
+	Turn turn;
+	TrackShot trackShot;
+	Shoot shoot;
+	TrackGear trackGear;
+	Gear gear;
+	Stop stop;
 	private final double LINELONG = 5;
 	private final double LINESHORT = 2;
 	private final double SHOOTLONG = 10;
 	private final double SHOOTMIDDLE = 5;
-	private final double SHOOTSHORT = 2;
+	private final double SHOOTSHORT = 3;
 	private final double SHOOTFINAL = 1;
 	private final double GEARLONG = 6;
 	private final double GEARMIDDLE = 3;
@@ -130,6 +130,18 @@ public class StateMachine {
 		shooter = sh;
 		imu = ADIS;
 		belt = lobby;
+		start = new Start(goal, pos);
+		move = new Move(goal, pos, drive);
+		turn = new Turn(goal, pos, drive, imu);
+		trackShot = new TrackShot(drive);
+		shoot = new Shoot(goal, pos, shooter, belt);
+		trackGear = new TrackGear();
+		gear = new Gear();
+		stop = new Stop(drive, shooter);
+		iteration = 1;
+		createMap();
+		state = classes.get(States.START).run();
+		prevState = state;
 	}
 	
 	public void createMap(){
@@ -143,7 +155,12 @@ public class StateMachine {
 		classes.put(States.STOP, stop);
 	}
 	
-	public void updateDistance(){
+	
+	public States getState(){
+		return state;
+	}
+	
+	private void updateDistance(){
 		switch (goal){
 			case NOTHING:
 				move.distance = 0;
@@ -217,7 +234,7 @@ public class StateMachine {
 		}
 	}
 	
-	public void updateAngles(){
+	private void updateAngles(){
 		switch (goal){
 			case NOTHING:
 				turn.desired = 0;
@@ -275,26 +292,22 @@ public class StateMachine {
 		}
 	}
 	
-	public void updateIteration(){
+	private void updateIteration(){
 		move.iteration = iteration;
 		turn.iteration = iteration;
 	}
 	
 	public void run(){
-		iteration = 0;
-		createMap();
-		state = classes.get(States.START).run();
-		prevState = state;
-		while (state != States.STOP){
-			updateIteration();
-			updateDistance();
-			updateAngles();
-			state = classes.get(state).run();
-			if (prevState != state){
-				drive.resetDistance();
-				iteration++;
-			}
-			prevState = state;
+		updateIteration();
+		updateDistance();
+		updateAngles();
+		System.out.println("State: " + state + "| Desired: " + turn.desired + "| Current: " + turn.current + "| Distance: " + move.distanceTraveled);
+		state = classes.get(state).run();
+		if (prevState != state){
+			//drive.resetDistance();
+			move.distanceTraveled = 0;
+			iteration++;
 		}
+		prevState = state;
 	}
 }
