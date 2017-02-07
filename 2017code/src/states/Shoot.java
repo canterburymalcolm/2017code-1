@@ -23,12 +23,10 @@ public class Shoot implements RobotState{
 
 	@Override
 	public States run() {
-		if (shooter.isEmpty()){
-			return States.STOP;
-		}
-		belt.controlBelt();
+		return States.STOP;
+		/*belt.controlBelt();
 		shooter.maxSpeed();
-		return States.SHOOT;
+		return States.SHOOT;*/
 	}
 	
 }
