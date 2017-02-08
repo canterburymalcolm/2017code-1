@@ -1,8 +1,9 @@
 package states;
 
-import states.StateMachine.States;
-
 public interface RobotState {
 	
-	public States run();
+	public void setValue(double value);
+	
+	public void run();
+
 }
