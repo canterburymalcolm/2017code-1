@@ -20,12 +20,13 @@ import org.usfirst.frc.team3328.robot.utilities.DriveTalons;
 import org.usfirst.frc.team3328.robot.utilities.IMU;
 import org.usfirst.frc.team3328.robot.utilities.ShooterTalons;
 import org.usfirst.frc.team3328.robot.utilities.SteamWorksXbox;
+import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import states.StateMachine;
 
 public class Robot extends IterativeRobot {
 	IMU imu;
@@ -44,11 +45,13 @@ public class Robot extends IterativeRobot {
 	SpeedController beltControl;
 	Controller driveXbox;
 	Controller utilXbox;
+	Tracking track;
 	DriveSystem drive;
 	Climber climb;
 	Feeder feed;
 	Shooter shoot;
 	HotelLobby belt;
+	StateMachine auto;
 	Comms comms;
 	Target target;
 	NetworkTablesTargetProvider targetProvider;
@@ -58,6 +61,7 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		imu = new ADIS16448_IMU();
 		driveEncoders = new DriveEncoders();
+		shootEncoder = new Encoder(0, 1);
 		fl = new Talon(0);
 		fr = new Talon(1);
 		bl = new Talon(2);
@@ -69,13 +73,15 @@ public class Robot extends IterativeRobot {
 		t2 = new Talon(7);
 		shootControl = new ShooterTalons(t1, t2);
 		beltControl = new Talon(8);
-		driveXbox = new SteamWorksXbox(0);
-		utilXbox = new SteamWorksXbox(1);
-		drive = new SteamWorksDriveSystem(driveEncoders, driveTalons, driveXbox, utilXbox, target);
+		driveXbox = new SteamWorksXbox(1);
+		utilXbox = new SteamWorksXbox(0);
+		track = new Tracking(target, utilXbox);
+		drive = new SteamWorksDriveSystem(driveEncoders, driveTalons, driveXbox, track);
 		climb = new SteamWorksClimber(climbControl, utilXbox);
 		feed = new SteamWorksFeeder(feedControl, utilXbox);
 		shoot = new SteamWorksShooter(shootEncoder, shootControl, utilXbox);
 		belt = new SteamWorksHotelLobby(beltControl, shoot);
+		auto = new StateMachine(2, drive, track, shoot, imu, belt);
 		comms = new Comms();
 		targetProvider = new NetworkTablesTargetProvider();
 		target = targetProvider.getTarget();
@@ -89,15 +95,22 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		//drive.autoAngle(0, imu.getAngleZ(), 0);
+		//drive.autoAngle(imu.getAngleZ(), 0);
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		drive.controlledMove();
-		drive.printSpeed();
+		/*drive.controlledMove();
+		drive.printSpeed();*/
 		//target.printValues();
-		
+		/*if (auto.getState() != States.STOP){
+			auto.run();
+		}*/
+		if (target.flip){
+			drive.move(1, 1);
+		}else{
+			drive.move(-1, -1);
+		}
 	}
 
 	@Override
