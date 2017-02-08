@@ -3,8 +3,6 @@ package states;
 import org.usfirst.frc.team3328.robot.subsystems.DriveSystem;
 import org.usfirst.frc.team3328.robot.subsystems.Shooter;
 
-import states.StateMachine.States;
-
 public class Stop implements RobotState{
 	
 	DriveSystem drive;
@@ -16,11 +14,15 @@ public class Stop implements RobotState{
 	}
 	
 	@Override
-	public States run() {
+	public void setValue(double val){
+		
+	}
+	
+	@Override
+	public void run() {
 		drive.move(0, 0);
-		//shooter.stop();
+		shooter.stop();
 		System.out.println("stopped");
-		return States.STOP;
 	}
 
 }
