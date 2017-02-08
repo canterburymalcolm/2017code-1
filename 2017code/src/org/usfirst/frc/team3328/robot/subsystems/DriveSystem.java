@@ -11,20 +11,18 @@ public interface DriveSystem {
 	
 	double getSpeed();
 	
+	void stop();
+	
 	//gets displacement between the desired angle and the current angle
 	//normalizes displacement so it's between 0 - 1
 	//rounds displacement off to 2 decimal places
 	//all values above 0 and below .05 are set to .05
-	double updateDisplacement(double desired, double current);
+	void updateDisplacement(double desired, double current);
 
 	//Uses the gyro to turn until it reaches a desired angle.
 	//should work while moving and while stopped
 	//the speed of each side is separately adjusted using the displacement
-	void autoAngle(double speed, double current, double desired);
-	
-	void track();
-	
-	boolean isTracking();
+	void autoAngle(double current, double desired);
 	
 	void move(double left, double right);
 
