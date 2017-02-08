@@ -6,26 +6,12 @@ import org.usfirst.frc.team3328.robot.subsystems.DriveSystem;
 import org.usfirst.frc.team3328.robot.subsystems.HotelLobby;
 import org.usfirst.frc.team3328.robot.subsystems.Shooter;
 import org.usfirst.frc.team3328.robot.utilities.IMU;
+import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
 public class StateMachine {
 	
-	Map<States, RobotState> classes = new HashMap<>();
-	public enum States {START, TURN, MOVE, TRACKSHOT, SHOOT, TRACKGEAR, GEAR, STOP};
-	public enum Goals {SHOOT, LINE, GEAR, NOTHING};
-	public enum Pos {FL, FM, FR, BL, BM, BR};
-	double currentAng;
-	double desiredAng;
-	double distance;
-	int iteration;
-	Goals goal;
-	Pos pos;
-	States state;
-	States prevState;
-	DriveSystem drive;
-	Shooter shooter;
-	HotelLobby belt;
-	IMU imu;
-	Start start;
+	//States
+	public enum States {TURN, MOVE, TRACKSHOT, SHOOT, TRACKGEAR, GEAR, STOP};
 	Move move;
 	Turn turn;
 	TrackShot trackShot;
@@ -33,119 +19,218 @@ public class StateMachine {
 	TrackGear trackGear;
 	Gear gear;
 	Stop stop;
-	private final double LINELONG = 5;
-	private final double LINESHORT = 2;
+	
+	//classes to be passed to the states
+	DriveSystem drive;
+	Tracking track;
+	Shooter shooter;
+	HotelLobby belt;
+	IMU imu;
+	
+	//Map of the states and their respective classes
+	Map<States, RobotState> classes = new HashMap<States, RobotState>(){{
+		put(States.MOVE, move);
+		put(States.TURN, turn);
+		put(States.TRACKSHOT, trackShot);
+		put(States.SHOOT, shoot);
+		put(States.TRACKGEAR, trackGear);
+		put(States.GEAR, gear);
+		put(States.STOP, stop);
+	}};
+	
+	//Constants
+	private final double LINELONG = 10;
+	private final double LINESHORT = 3;
 	private final double SHOOTLONG = 10;
 	private final double SHOOTMIDDLE = 5;
 	private final double SHOOTSHORT = 3;
-	private final double SHOOTFINAL = 1;
-	private final double GEARLONG = 6;
-	private final double GEARMIDDLE = 3;
-	private final double GEARSHORT = 1;
+	private final double GEARlONG = 10;
+	private final double GEARMIDDLE = 5;
+	private final double GEARSHORT = 3;
 	
+	//Modes
+	List<State> lineStandard = Arrays.asList(
+			new State(States.MOVE, LINELONG),
+			new State(States.STOP, 0));
+	List<State> lineMiddle = Arrays.asList(
+			new State(States.TURN, 90),
+			new State(States.MOVE, LINESHORT),
+			new State(States.TURN, -90),
+			new State(States.MOVE, LINELONG),
+			new State(States.STOP, 0));
+	List<State> shootFL = Arrays.asList(
+			new State(States.TURN, 90),
+			new State(States.MOVE, SHOOTLONG),
+			new State(States.TURN, -90),
+			new State(States.MOVE, SHOOTMIDDLE),
+			new State(States.TURN, 90),
+			new State(States.MOVE, SHOOTSHORT),
+			new State(States.TRACKSHOT, 0),
+			new State(States.SHOOT, 0),
+			new State(States.STOP, 0));
+	List<State> shootFM = Arrays.asList(
+			new State(States.TURN, 90),
+			new State(States.MOVE, SHOOTMIDDLE),
+			new State(States.TURN, -90),
+			new State(States.MOVE, SHOOTMIDDLE),
+			new State(States.TURN, 90),
+			new State(States.MOVE, SHOOTSHORT),
+			new State(States.TRACKSHOT, 0),
+			new State(States.SHOOT, 0),
+			new State(States.STOP, 0));
+	List<State> shootFR = Arrays.asList(
+			new State(States.MOVE, SHOOTMIDDLE),
+			new State(States.TURN, 90),
+			new State(States.MOVE, SHOOTSHORT),
+			new State(States.TRACKSHOT, 0),
+			new State(States.SHOOT, 0),
+			new State(States.STOP, 0));
+	List<State> shootBL = Arrays.asList(
+			new State(States.MOVE, SHOOTMIDDLE),
+			new State(States.TURN, 90),
+			new State(States.MOVE, SHOOTSHORT),
+			new State(States.TRACKSHOT, 0),
+			new State(States.SHOOT, 0),
+			new State(States.STOP, 0));
+	List<State> shootBM = Arrays.asList(
+			new State(States.TURN, 90),
+			new State(States.MOVE, SHOOTMIDDLE),
+			new State(States.TURN, -90),
+			new State(States.MOVE, SHOOTMIDDLE),
+			new State(States.TURN, 90),
+			new State(States.MOVE, SHOOTSHORT),
+			new State(States.TRACKSHOT, 0),
+			new State(States.SHOOT, 0),
+			new State(States.STOP, 0));
+	List<State> shootBR = Arrays.asList(
+			new State(States.TURN, 90),
+			new State(States.MOVE, SHOOTLONG),
+			new State(States.TURN, -90),
+			new State(States.MOVE, SHOOTMIDDLE),
+			new State(States.TURN, 90),
+			new State(States.MOVE, SHOOTSHORT),
+			new State(States.TRACKSHOT, 0),
+			new State(States.SHOOT, 0),
+			new State(States.STOP, 0));
+	List<State> gearFL = Arrays.asList(
+			new State(States.MOVE, GEARlONG),
+			new State(States.TURN, 90),
+			new State(States.MOVE, GEARSHORT),
+			new State(States.TRACKGEAR, 0),
+			new State(States.GEAR, 0));
+	List<State> gearFM = Arrays.asList(
+			new State(States.MOVE, GEARMIDDLE),
+			new State(States.TRACKGEAR, 0),
+			new State(States.GEAR, 0));
+	List<State> gearFR = Arrays.asList(
+			new State(States.MOVE, GEARlONG),
+			new State(States.TURN, -90),
+			new State(States.MOVE, GEARSHORT),
+			new State(States.TRACKGEAR, 0),
+			new State(States.GEAR, 0));
+	List<State> gearBL = Arrays.asList(
+			new State(States.MOVE, GEARlONG),
+			new State(States.TURN, -90),
+			new State(States.MOVE, GEARSHORT),
+			new State(States.TRACKGEAR, 0),
+			new State(States.GEAR, 0));
+	List<State> gearBM = Arrays.asList(
+			new State(States.MOVE, GEARMIDDLE),
+			new State(States.TRACKGEAR, 0),
+			new State(States.GEAR, 0));
+	List<State> gearBR = Arrays.asList(
+			new State(States.MOVE, GEARlONG),
+			new State(States.TURN, 90),
+			new State(States.MOVE, GEARSHORT),
+			new State(States.TRACKGEAR, 0),
+			new State(States.GEAR, 0));
+	List<State> custom = Arrays.asList();
+	List<State> nothing = Arrays.asList(
+			new State(States.STOP, 0));
 	
-	public StateMachine(int mode, DriveSystem dr, Shooter sh, IMU ADIS, HotelLobby lobby){
-		switch (mode){
+	List<State> mode;
+	
+	public StateMachine(int input, DriveSystem dr, Tracking trackingSystem, Shooter sh, IMU ADIS, HotelLobby lobby){
+		switch (input){
 			case 0:
-				goal = Goals.SHOOT;
-				pos = Pos.FL;
+				mode = lineStandard;
 				break;
 			case 1:
-				goal = Goals.SHOOT;
-				pos = Pos.FM;
+				mode = lineMiddle;
 				break;
 			case 2:
-				goal = Goals.SHOOT;
-				pos = Pos.FR;
+				mode = lineStandard;
 				break;
 			case 3:
-				goal = Goals.SHOOT;
-				pos = Pos.BL;
+				mode = lineStandard;
 				break;
 			case 4:
-				goal = Goals.SHOOT;
-				pos = Pos.BM;
+				mode = lineMiddle;
 				break;
 			case 5:
-				goal = Goals.SHOOT;
-				pos = Pos.BR;
+				mode = lineStandard;
 				break;
 			case 6:
-				goal = Goals.LINE;
-				pos = Pos.FL;
+				mode = shootFL;
 				break;
 			case 7:
-				goal = Goals.LINE;
-				pos = Pos.FM;
+				mode = shootFM;
 				break;
 			case 8:
-				goal = Goals.LINE;
-				pos = Pos.FR;
+				mode = shootFR;
 				break;
 			case 9:
-				goal = Goals.LINE;
-				pos = Pos.BL;
+				mode = shootBL;
 				break;
 			case 10:
-				goal = Goals.LINE;
-				pos = Pos.BM;
+				mode = shootBM;
 				break;
 			case 11:
-				goal = Goals.LINE;
-				pos = Pos.BR;
+				mode = shootBR;
 				break;
 			case 12:
-				goal = Goals.NOTHING;
-				pos = Pos.FL;
+				mode = gearFL;
 				break;
 			case 13:
-				goal = Goals.GEAR;
-				pos = Pos.FL;
+				mode = gearFM;
 				break;
 			case 14:
-				goal = Goals.GEAR;
-				pos = Pos.FM;
+				mode = gearFR;
 				break;
 			case 15:
-				goal = Goals.GEAR;
-				pos = Pos.FR;
+				mode = gearBL;
 				break;
 			case 16:
-				goal = Goals.GEAR;
-				pos = Pos.BL;
+				mode = gearBM;
 				break;
 			case 17:
-				goal = Goals.GEAR;
-				pos = Pos.BM;
+				mode = gearBR;
 				break;
 			case 18:
-				goal = Goals.GEAR;
-				pos = Pos.BR;
+				mode = custom;
+				break;
+			case 19:
+				mode = nothing;
 				break;
 			default:
-				goal = Goals.NOTHING;
-				pos = Pos.FL;
+				mode = nothing;
 		}
 		drive = dr;
+		track = trackingSystem;
 		shooter = sh;
 		imu = ADIS;
 		belt = lobby;
-		start = new Start(goal, pos);
-		move = new Move(goal, pos, drive);
-		turn = new Turn(goal, pos, drive, imu);
-		trackShot = new TrackShot(drive);
-		shoot = new Shoot(goal, pos, shooter, belt);
-		trackGear = new TrackGear();
-		gear = new Gear();
+		move = new Move(drive);
+		turn = new Turn(drive, imu);
+		trackShot = new TrackShot(drive, track);
+		shoot = new Shoot(shooter, belt);
+		trackGear = new TrackGear(drive, track);
+		gear = new Gear(drive);
 		stop = new Stop(drive, shooter);
-		iteration = 1;
-		createMap();
-		state = classes.get(States.START).run();
-		prevState = state;
+		//createMap();
 	}
 	
 	public void createMap(){
-		classes.put(States.START, start);
 		classes.put(States.MOVE, move);
 		classes.put(States.TURN, turn);
 		classes.put(States.TRACKSHOT, trackShot);
@@ -155,159 +240,11 @@ public class StateMachine {
 		classes.put(States.STOP, stop);
 	}
 	
-	
-	public States getState(){
-		return state;
-	}
-	
-	private void updateDistance(){
-		switch (goal){
-			case NOTHING:
-				move.distance = 0;
-				break;
-			case LINE:
-				if (move.distance == -1){
-					if (pos == Pos.FL || pos == Pos.FR || pos == Pos.BR || pos == Pos.BL){
-						if (iteration == 1){
-							move.distance = LINELONG;
-						}
-					}else if (pos == Pos.FM || pos == Pos.BM){
-						if (iteration == 2){
-							move.distance = LINESHORT;
-						}
-						if (iteration == 4){
-							move.distance = LINELONG;
-						}
-					}
-				}
-				break;
-			case SHOOT:
-				if (move.distance == -1){
-					if (pos == Pos.FL || pos == Pos.BR){
-						if (iteration == 2){
-							move.distance = SHOOTLONG;
-						}
-						if (iteration == 4){
-							move.distance = SHOOTSHORT;
-						}
-						if (iteration == 6){
-							move.distance = SHOOTFINAL;
-						}
-					}else if (pos == Pos.FM || pos == Pos.BM){
-						if (iteration == 2){
-							move.distance = SHOOTMIDDLE;
-						}
-						if (iteration == 4){
-							move.distance = SHOOTSHORT;
-						}
-						if (iteration == 6){
-							move.distance = SHOOTFINAL;
-						}
-					}else if (pos == Pos.FR || pos == Pos.BL){
-						if (iteration == 1){
-							move.distance = SHOOTSHORT;
-						}
-						if (iteration == 3){
-							move.distance = SHOOTFINAL;
-						}
-					}
-				}
-				break;
-			case GEAR:
-				if (move.distance == -1){
-					if (pos == Pos.FL || pos == Pos.BR || pos == Pos.FR || pos == Pos.BL){
-						if (iteration == 1){
-							move.distance = GEARLONG;
-						}
-						if (iteration == 3){
-							move.distance = GEARSHORT;
-						}
-					}else if (pos == Pos.FM || pos == Pos.BM){
-						if (iteration == 1){
-							move.distance = GEARMIDDLE;
-						}
-					}
-				}
-				break;
-			default:
-				move.distance = 0;
-		}
-	}
-	
-	private void updateAngles(){
-		switch (goal){
-			case NOTHING:
-				turn.desired = 0;
-				break;
-			case LINE:
-				if (turn.desired == 400){
-					if (pos == Pos.FL || pos == Pos.FR || pos == Pos.BR || pos == Pos.BL){
-						turn.desired = 0;
-					}else if (pos == Pos.FM || pos == Pos.BM){
-						if (iteration == 1){
-							turn.desired = turn.current + 90;
-						}
-						if (iteration == 3){
-							move.distance = turn.current - 90;
-						}
-					}
-				}
-				break;
-			case SHOOT:
-				if (turn.desired == 400){
-					if (pos == Pos.FL || pos == Pos.FM || pos == Pos.BR || pos == Pos.BM){
-						if (iteration == 1){
-							turn.desired = turn.current + 90;
-						}
-						if (iteration == 3){
-							turn.desired = turn.current - 90;
-						}
-						if (iteration == 5){
-							turn.desired = turn.current + 90;
-						}
-					}else if (pos == Pos.FR || pos == Pos.BL){
-						if (iteration == 2){
-							turn.desired = turn.current + 90;
-						}
-					}
-				}
-				break;
-			case GEAR:
-				if (turn.desired == 400){
-					if (pos == Pos.FL || pos == Pos.BR){
-						if (iteration == 2){
-							turn.desired = turn.current + 90;
-						}
-					}else if(pos == Pos.FR || pos == Pos.BL){
-						if (iteration == 2){
-							turn.desired = turn.current - 90;
-						}
-					}else if(pos == Pos.FM || pos == Pos.BM){
-						turn.desired = 0;
-					}
-				}
-				break;
-			default:
-				turn.desired = 0;
-		}
-	}
-	
-	private void updateIteration(){
-		move.iteration = iteration;
-		turn.iteration = iteration;
-	}
-	
 	public void run(){
-		updateIteration();
-		updateDistance();
-		updateAngles();
-		System.out.println("State: " + state + "| Desired: " + turn.desired + "| Current: " + turn.current + "| Distance: " + move.distanceTraveled);
-		state = classes.get(state).run();
-		if (prevState != state){
-			//drive.resetDistance();
-			move.distanceTraveled = 0;
-			iteration++;
+		for(int i = 0; i < mode.size(); i++){
+			System.out.printf("State: %s", mode.get(i).getState());
+			classes.get(mode.get(i).getState()).setValue(mode.get(i).getValue());
+			classes.get(mode.get(i).getState()).run();
 		}
-		prevState = state;
 	}
 }
