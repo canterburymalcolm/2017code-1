@@ -10,17 +10,17 @@ public class DriveEncoders {
 	Encoder bl;
 	
 	public DriveEncoders(){
-		fr = new Encoder(0,0);
-		fl = new Encoder(1,1);
-		br = new Encoder(2,2);
-		bl = new Encoder(3,3);
+		fr = new Encoder(2,3);
+		fl = new Encoder(4,5);
+		br = new Encoder(6,7);
+		bl = new Encoder(8,9);
 	}
 	
 	public void reset(){
-		fr.reset();
+		/*fr.reset();
 		fl.reset();
 		br.reset();
-		bl.reset();
+		bl.reset();*/
 	}
 	
 	public double frRate(){
