@@ -1,35 +1,32 @@
 package org.usfirst.frc.team3328.robot.subsystems;
 
-import org.usfirst.frc.team3328.robot.networking.Target;
 import org.usfirst.frc.team3328.robot.utilities.Controller;
 import org.usfirst.frc.team3328.robot.utilities.DriveEncoders;
 import org.usfirst.frc.team3328.robot.utilities.DriveTalons;
 import org.usfirst.frc.team3328.robot.utilities.SteamWorksXbox.Buttons;
+import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
 public class SteamWorksDriveSystem implements DriveSystem {
 	
 	Controller driveXbox;
-	Controller utilXbox;
+	Tracking track;
 	private DriveTalons talons;
 	private DriveEncoders encoders;
 	private double restraint = 1;
 	private double factor = 1.1;
-	private double displacement;
+	public double displacement;
+	private double angleDeadZone = 20;
+	private double angleSpeed = .08;
 	private double speed;
-	private double pixel;
-	private double trackSpeed = 0.08;
-	private boolean tracking = false;
-	Target target;
 	
 	//instantiates talons assigns controller to "con"
-	public SteamWorksDriveSystem(DriveEncoders driveEncoders, DriveTalons driveTalons,
-								 Controller Controller1, Controller Controller2, Target targetPixelValue){
+	public SteamWorksDriveSystem(DriveEncoders driveEncoders, DriveTalons driveTalons
+								, Controller Controller1, Tracking PID){
 		encoders = driveEncoders;
 		talons = driveTalons;
 		driveXbox = Controller1;
-		utilXbox = Controller2;
-		target = targetPixelValue;
-		
+		track = PID;
+		track.setGoal(320);
 	}
 	
 	@Override
@@ -55,22 +52,17 @@ public class SteamWorksDriveSystem implements DriveSystem {
 		talons.left(left);
 	}
 	
+	@Override
+	public void stop(){
+		talons.stop();
+	}
+	
 	//formats and prints the value that the speed controllers are receiving.
 	@Override
 	public void printSpeed(){
 		System.out.printf("%.2f || %.2f\n",talons.getfl(), talons.getfr());
 	}
 	
-	
-	//Dynamic updating for strength of angle correction during auto
-	private void updateFactor(){
-		if (driveXbox.getButtonRelease(Buttons.A) && factor > 1){
-			factor -= .1;
-		}
-		if (driveXbox.getButtonRelease(Buttons.B) && factor < 10){
-			factor += .1;
-		}
-	}
 	
 	//the speed during teleop is divided by "restraint"
 	//the left and right bumpers lower and raise "restraint" respectively
@@ -89,51 +81,22 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	//rounds displacement off to 2 decimal places
 	//all values above 0 and below .05 are set to .05
 	@Override
-	public double updateDisplacement(double desired, double current){
+	public void updateDisplacement(double desired, double current){
 		displacement = (current - desired) / 360;
 		if (displacement > 0 && displacement < .05){
 			displacement = .05;
 		}
-		return displacement;
 	}
 	
 	//Uses the gyro to turn until it reaches a desired angle.
 	//should work while moving and while stopped
 	//the speed of each side is separately adjusted using the displacement
 	@Override
-	public void autoAngle(double speed, double current, double desired){
-		updateFactor();
-		System.out.println(factor);
-		updateDisplacement(desired, current);
-		talons.right((speed + displacement) * factor);
-		talons.left((speed - displacement) * factor);
-	}
-	
-	//toggles tracking if the left bumper is pressed
-	//disables tracking if aligned
-	//returns true if tracking
-	@Override
-	public boolean isTracking(){
-		if (pixel < 350 && pixel > 290){
-			tracking = false;
-		}
-		if (utilXbox.getButtonRelease(Buttons.LBUMP)){
-			tracking = !tracking;
-		}
-		return tracking;
-	}	
-	
-	//takes a pixel offset to aim the robot
-	//turns until it's within a specified dead zone
-	//turns at trackSpeed if outside of dead zone
-	@Override
-	public void track(){
-		if (pixel > 350){
-			move(trackSpeed, -trackSpeed);
-		}else if (pixel < 290){
-			move(-trackSpeed, trackSpeed);
-		}else{
-			talons.stop();
+	public void autoAngle(double current, double desired){
+		displacement = Math.abs(desired - current);
+		if (displacement > angleDeadZone){
+			talons.right(angleSpeed * factor);
+			talons.left(angleSpeed * factor);
 		}
 	}
 	
@@ -142,13 +105,12 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	//sets each motor to the appropriate speed adjusted by the restraint
 	@Override
 	public void controlledMove(){
-		if (!isTracking()){
-			pixel = target.getPixel();
+		if (!track.isTracking()){
 			restrain();
 			move((driveXbox.getX() + driveXbox.getY()) / restraint, 
 				(driveXbox.getX() - driveXbox.getY()) / restraint);
 		}else{
-			track();
+			move(track.track(), -track.track());
 		}
 	}
 
