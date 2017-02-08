@@ -1,24 +1,30 @@
 package states;
 
 import org.usfirst.frc.team3328.robot.subsystems.DriveSystem;
-
-import states.StateMachine.States;
+import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
 public class TrackShot implements RobotState {
 	
 	DriveSystem drive;
+	Tracking track;
 	
-	public TrackShot(DriveSystem dr){
+	public TrackShot(DriveSystem dr, Tracking trackingSystem){
 		drive = dr;
+		track = trackingSystem;
 	}
 	
 	@Override
-	public States run() {
-		drive.track();
-		if (drive.isTracking()){
-			return States.TRACKSHOT;
+	public void setValue(double value){
+		
+	}
+	
+	@Override
+	public void run() {
+		track.track();
+		if (track.tracking){
+			drive.controlledMove();
 		}
-		return States.SHOOT;
+		drive.stop();
 	}
 
 }
