@@ -24,7 +24,7 @@ public class SteamWorksShooter implements Shooter {
 	@Override
 	public boolean isEmpty(){
 		//returns true if hotel is empty
-		return false;
+		return true;
 	}
 	
 	@Override
