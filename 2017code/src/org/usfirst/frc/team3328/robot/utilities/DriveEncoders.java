@@ -4,16 +4,12 @@ import edu.wpi.first.wpilibj.Encoder;
 
 public class DriveEncoders {
 	
-	Encoder fr;
-	Encoder fl;
-	Encoder br;
-	Encoder bl;
+	Encoder right;
+	Encoder left;
 	
 	public DriveEncoders(){
-		fr = new Encoder(2,3);
-		fl = new Encoder(4,5);
-		br = new Encoder(6,7);
-		bl = new Encoder(8,9);
+		right = new Encoder(2,3);
+		left = new Encoder(4,5);
 	}
 	
 	public void reset(){
@@ -23,35 +19,28 @@ public class DriveEncoders {
 		bl.reset();*/
 	}
 	
-	public double frRate(){
-		return fr.getRate();
+	public double getDistance(){
+		return (rightDistance() + leftDistance()) / 2;
+	}
+	
+	public double getOffset(){
+		return rightDistance() - leftDistance();
+	}
+	
+	public double rightRate(){
+		return right.getRate();
 	}
 
-	public double flRate(){
-		return fl.getRate();
+	public double leftRate(){
+		return left.getRate();
 	}
 	
-	public double brRate(){
-		return br.getRate();
+	public double rightDistance(){
+		return right.getDistance();
 	}
 	
-	public double blRate(){
-		return bl.getRate();
+	public double leftDistance(){
+		return left.getDistance();
 	}
 	
-	public double frDistance(){
-		return fr.getDistance();
-	}
-	
-	public double flDistance(){
-		return fl.getDistance();
-	}
-	
-	public double brDistance(){
-		return br.getDistance();
-	}
-	
-	public double blDistance(){
-		return bl.getDistance();
-	}
 }
