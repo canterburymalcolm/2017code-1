@@ -2,7 +2,7 @@ package org.usfirst.frc.team3328.robot.networking;
 
 public class NetworkTablesTargetProvider implements TargetProvider{
 	
-	Target target = new Target();
+	Target target = new SteamWorksTarget();
 	
 	
 	//Starts "listenerThread" upon instantiation
