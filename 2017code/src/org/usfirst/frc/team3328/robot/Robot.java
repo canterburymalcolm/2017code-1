@@ -95,22 +95,14 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		//drive.autoAngle(imu.getAngleZ(), 0);
+		auto.run();
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		/*drive.controlledMove();
-		drive.printSpeed();*/
+		drive.controlledMove();
+		drive.printSpeed();
 		//target.printValues();
-		/*if (auto.getState() != States.STOP){
-			auto.run();
-		}*/
-		if (target.flip){
-			drive.move(1, 1);
-		}else{
-			drive.move(-1, -1);
-		}
 	}
 
 	@Override
