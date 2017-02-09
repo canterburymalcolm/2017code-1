@@ -1,43 +1,60 @@
 package org.usfirst.frc.team3328.robot;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.usfirst.frc.team3328.robot.utilities.Controller;
 import org.usfirst.frc.team3328.robot.utilities.SteamWorksXbox.Buttons;
 
 public class FakeController implements Controller {
 
-	double x;
-	double y;
+	double xSpeed;
+	double ySpeed;
+	int num;
+	boolean a, b, x, y, rBump, lBump;
+	Map<Buttons, Boolean> buttons = new HashMap<Buttons, Boolean>(){{
+		put(Buttons.A, a);
+		put(Buttons.B, b);
+		put(Buttons.X, x);
+		put(Buttons.Y, y);
+		put(Buttons.RBUMP, rBump);
+		put(Buttons.LBUMP, lBump);
+	}};
+	
 	
 	@Override
 	public double getX() {
 		// TODO Auto-generated method stub
-		return x;
+		return xSpeed;
 	}
 
 	@Override
 	public double getY() {
 		// TODO Auto-generated method stub
-		return y;
+		return ySpeed;
 	}
 	
 	public void setX(double speed){
-		x = speed;
+		xSpeed = speed;
 	}
 	
 	public void setY(double speed){
-		y = speed;
+		ySpeed = speed;
+	}
+	
+	public void setlBump(boolean state){
+		lBump = state;
 	}
 	
 	@Override
 	public boolean getButtonRelease(Buttons but) {
-		int num = but.value;
-		// TODO Auto-generated method stub
-		return false;
+		num = but.value;
+		return buttons.get(but);
 	}
 
 	@Override
 	public boolean getButtonPress(Buttons but) {
-		int num = but.value;
+		num = but.value;
 		// TODO Auto-generated method stub
 		return false;
 	}
