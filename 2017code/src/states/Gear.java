@@ -17,7 +17,11 @@ public class Gear implements RobotState{
 	
 	@Override
 	public void run() {
-		
+		drive.resetDistance();
+		while(drive.placingGear()){
+			drive.placeGear();
+		}
+		drive.stop();
 	}
 
 }
