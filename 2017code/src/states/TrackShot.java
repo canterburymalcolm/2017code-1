@@ -21,7 +21,7 @@ public class TrackShot implements RobotState {
 	@Override
 	public void run() {
 		track.track();
-		if (track.tracking){
+		while (track.getTracking()){
 			drive.controlledMove();
 		}
 		drive.stop();

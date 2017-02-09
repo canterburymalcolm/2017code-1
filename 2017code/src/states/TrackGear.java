@@ -21,7 +21,7 @@ public class TrackGear implements RobotState{
 	@Override
 	public void run() {
 		track.track();
-		while (track.tracking) {
+		while (track.getTracking()) {
 			drive.controlledMove();
 		}
 		drive.stop();
