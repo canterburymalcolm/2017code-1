@@ -1,11 +1,13 @@
 package org.usfirst.frc.team3328.robot.networking;
 
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 
 public class Listener implements Runnable, ITableListener {
 	
+	SpeedController talon;
 	Thread listener;
 	Target target;
 	NetworkTable table;
@@ -33,6 +35,7 @@ public class Listener implements Runnable, ITableListener {
 		target.setStatus(isNew);
 		target.setTime(System.nanoTime());
 		if (key.equals("pixels")){
+			System.out.printf("pixel: %06.2f\n", table.getNumber("pixels", 0.0));
 			target.setPixel(table.getNumber("pixels", 0.0)); 
 		}
 	}

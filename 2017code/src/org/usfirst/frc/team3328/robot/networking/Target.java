@@ -1,6 +1,5 @@
 package org.usfirst.frc.team3328.robot.networking;
 
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Target {
 	//private AtomicReference<Double> pixel; 
@@ -8,7 +7,6 @@ public class Target {
 	private double distance;
 	private long lastTime = 0, time = 0;
 	private boolean status = false;
-	public boolean flip;
 	
 	public double getPixel(){
 		//return pixel.get();
