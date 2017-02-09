@@ -2,7 +2,6 @@ package org.usfirst.frc.team3328.robot;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
-import org.usfirst.frc.team3328.robot.networking.Target;
 import org.usfirst.frc.team3328.robot.subsystems.SteamWorksDriveSystem;
 import org.usfirst.frc.team3328.robot.utilities.DriveEncoders;
 import org.usfirst.frc.team3328.robot.utilities.DriveTalons;
@@ -13,7 +12,7 @@ public class SteamWorksDriveSystemTest {
 	DriveEncoders encoders = new DriveEncoders();
 	FakeController fakeCont1 = new FakeController();
 	FakeController fakeCont2 = new FakeController();
-	Target target = new Target();
+	FakeTarget target = new FakeTarget();
 	Tracking track = new Tracking(target, fakeCont2);
 	FakeSpeedController fl = new FakeSpeedController();
 	FakeSpeedController fr = new FakeSpeedController();
@@ -32,18 +31,36 @@ public class SteamWorksDriveSystemTest {
 	}
 	
 	@Test
-	public void updateDisplacement_smallDisplacement_displacementSetToPoint5(){
-		imu.setAngleZ(Math.random() / 20);
-		drive.updateDisplacement(0, imu.getAngleZ());
-		assertEquals(drive.displacement, .05, 0);
+	public void controlledMove_xLargerThanY_rightMotorTurnsForwards() {
+		fakeCont1.setY(1);
+		fakeCont1.setX(0);
+		drive.controlledMove();
+		assertEquals(-1.0, (fr.speed),  0);
 	}
 	
 	@Test
-	public void autoAngle_robotTurnedRight_rightMotorTurnsForwards(){
-		imu.setAngleZ(20);
-		drive.autoAngle(imu.getAngleZ(), 0);
+	public void restrain_LBumperIsPressed_restraintIncrementedBy1(){
+		fakeCont1.setlBump(true);
+		drive.restrain();
+		assertTrue(drive.restraint == 2);
+	}
+	
+	@Test
+	public void autoAngle_currentIsLessThanDesired_rightMotorTurnsForwards(){
+		drive.autoAngle(-90, 0);
 		assertTrue(fr.speed < 0 && br.speed < 0);
-		
+	}
+	
+	@Test
+	public void autoAngle_currentIsGreaterThanDesired_rightMotorTurnsForwards(){
+		drive.autoAngle(0, 90);
+		assertTrue(fr.speed < 0 && br.speed < 0);
+	}
+	
+	@Test
+	public void autoAngle_currentIsEqualToDesired_noMovement(){
+		drive.autoAngle(0, 0);
+		assertTrue(fr.speed == 0 && fl.speed == 0);
 	}
 	
 }
