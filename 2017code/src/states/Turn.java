@@ -36,9 +36,7 @@ public class Turn implements RobotState{
 		while (!inRange()){
 			drive.autoAngle(current, desired);
 		}
-		drive.stop();
-		desired = 400;
-		
+		drive.stop();		
 	}
 
 }
