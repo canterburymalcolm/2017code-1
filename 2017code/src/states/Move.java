@@ -8,7 +8,7 @@ public class Move implements RobotState{
 	double distance = -1;
 	double distanceTraveled;
 	
-	public Move( DriveSystem dr){
+	public Move(DriveSystem dr){
 		drive = dr;
 	}
 	
@@ -20,8 +20,8 @@ public class Move implements RobotState{
 	@Override
 	public void run() {
 		System.out.println("moving");
-		distanceTraveled += .01;
 		while (distanceTraveled < distance){
+			distanceTraveled += .01;
 			drive.move(.2, .2);
 		}
 		drive.stop();
