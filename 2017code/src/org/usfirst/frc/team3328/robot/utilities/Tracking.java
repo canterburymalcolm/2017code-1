@@ -12,8 +12,8 @@ public class Tracking extends PIDSubsystem{
 	private double pixel;
 	private double trackSpeed;
 	private double goal;
-	private int pixelDeadZone = 20;
-	public boolean tracking;
+	private int deadZone = 10;
+	private boolean tracking;
 	
 	public Tracking(Target pixelTarget, Controller utilitiesController){
 		super("tracking", 0, 0, 0);
@@ -27,11 +27,19 @@ public class Tracking extends PIDSubsystem{
 		goal = target;
 	}
 	
+	public double getGoal(){
+		return goal;
+	}
+	
+	public boolean getTracking(){
+		return tracking;
+	}
+	
 	//toggles tracking if the left bumper is pressed
 	//disables tracking if aligned
 	//returns true if tracking
 	public boolean isTracking(){
-		if (pixel < 350 && pixel > 290){
+		if (pixel < goal + deadZone && pixel > goal - deadZone){
 			tracking = false;
 		}
 		if (utilXbox.getButtonRelease(Buttons.LBUMP)){
@@ -46,9 +54,9 @@ public class Tracking extends PIDSubsystem{
 	public double track(){
 		pixel = target.getPixel();
 		tracking = true;
-		if (pixel > goal + pixelDeadZone){
+		if (pixel > goal + deadZone){
 			return trackSpeed;
-		}else if (pixel < goal - pixelDeadZone){
+		}else if (pixel < goal - deadZone){
 			return -trackSpeed;
 		}else{
 			return 0;
