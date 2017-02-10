@@ -1,24 +1,26 @@
 package org.usfirst.frc.team3328.robot.subsystems;
 
-import org.usfirst.frc.team3328.robot.utilities.Controller;
 import org.usfirst.frc.team3328.robot.utilities.ShooterTalons;
-import org.usfirst.frc.team3328.robot.utilities.SteamWorksXbox.Buttons;
 
 import edu.wpi.first.wpilibj.Encoder;
 
 public class SteamWorksShooter implements Shooter {
 
-	
-	Encoder coder;
+	HotelLobby belt;
+	Encoder encoder;
 	ShooterTalons talons;
-	Controller con;
 	private double speed = 0;
 	boolean active = false;
 	
-	public SteamWorksShooter(Encoder encoder, ShooterTalons talonController, Controller controller){
-		coder = encoder;
-		talons = talonController;
-		con = controller;
+	public SteamWorksShooter(Encoder encoder, ShooterTalons talons, HotelLobby belt){
+		this.encoder = encoder;
+		this.talons = talons;
+		this.belt = belt;
+	}
+	
+	@Override
+	public HotelLobby getBelt(){
+		return belt;
 	}
 	
 	@Override
@@ -29,7 +31,7 @@ public class SteamWorksShooter implements Shooter {
 	
 	@Override
 	public boolean isMax(){
-		return coder.get() >= 1000;
+		return encoder.get() >= 1000;
 	}
 	
 	// Gradually builds up speed to max
@@ -50,20 +52,22 @@ public class SteamWorksShooter implements Shooter {
 		talons.set(speed);
 	}
 	
+	@Override
+	public void toggleShooter(){
+		active = !active;
+	}
 	
 	// Method to check whether the button
 	// is pressed and sets the talons to
 	// max speed whether or not.
 	@Override
-	public void shooterControl(){
-		if (con.getButtonRelease(Buttons.RBUMP)){	
-			active = !active;
-			System.out.println(active);
-		}
+	public void shooterControl(){	
 		if (active){
 			maxSpeed();
+			belt.runBelt();
 		}else{
 			stop();
+			belt.stopBelt();
 		}
 	
 	}
