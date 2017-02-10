@@ -19,11 +19,13 @@ public class Shoot implements RobotState{
 	}
 	
 	@Override
-	public void run() {
-		while (!shooter.isEmpty()){
-			belt.controlBelt();
+	public boolean run() {
+		if (!shooter.isEmpty()){
+			belt.runBelt();
 			shooter.maxSpeed();
+			return false;
 		}
 		shooter.stop();
+		return true;
 	}
 }
