@@ -12,8 +12,8 @@ public class SteamWorksJoystick implements Controller {
 	boolean[] button = new boolean[10];
 	
 	//instantiates the joystick
-	public SteamWorksJoystick(boolean type){
-		joy = new Joystick(0);
+	public SteamWorksJoystick(int channel){
+		joy = new Joystick(channel);
 	}
 	
 	//returns the x axis value for the joystick
