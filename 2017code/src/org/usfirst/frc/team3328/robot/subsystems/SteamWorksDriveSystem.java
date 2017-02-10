@@ -1,17 +1,16 @@
 package org.usfirst.frc.team3328.robot.subsystems;
 
-import org.usfirst.frc.team3328.robot.utilities.Controller;
+import org.usfirst.frc.team3328.robot.utilities.ADIS16448_IMU;
 import org.usfirst.frc.team3328.robot.utilities.DriveEncoders;
 import org.usfirst.frc.team3328.robot.utilities.DriveTalons;
-import org.usfirst.frc.team3328.robot.utilities.SteamWorksXbox.Buttons;
+import org.usfirst.frc.team3328.robot.utilities.PID;
 import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
-
-public class SteamWorksDriveSystem extends PIDSubsystem implements DriveSystem {
+public class SteamWorksDriveSystem implements DriveSystem {
 	
-	Controller driveXbox;
 	Tracking track;
+	ADIS16448_IMU imu;
+	PID pid;
 	private DriveTalons talons;
 	private DriveEncoders encoders;
 	public double restraint = 1;
@@ -21,26 +20,31 @@ public class SteamWorksDriveSystem extends PIDSubsystem implements DriveSystem {
 	private double gearSpeed = .1;
 	boolean placingGear = false;
 	
-	//instantiates talons assigns controller to "con"
-	public SteamWorksDriveSystem(DriveEncoders driveEncoders, DriveTalons driveTalons
-								, Controller Controller1, Tracking PID){
-		super("anglePID", 0, 0, 0);
-		setAbsoluteTolerance(0.05);
-		getPIDController().setContinuous(false);
-		encoders = driveEncoders;
-		talons = driveTalons;
-		driveXbox = Controller1;
-		track = PID;
-		track.setGoal(320);
+	public SteamWorksDriveSystem(DriveEncoders encoders, DriveTalons talons, 
+								Tracking track, ADIS16448_IMU imu, PID pid){
+		this.encoders = encoders;
+		this.talons = talons;
+		this.track = track;
+		this.track.setGoal(320);
+		this.imu = imu;
+		this.pid = pid;
+	}
+	
+	@Override
+	public ADIS16448_IMU getImu(){
+		return imu;
+	}
+	
+	@Override
+	public Tracking getTrack(){
+		return track;
 	}
 	
 	public void resetDistance(){
 		encoders.reset();
 	}
 	
-
 	@Override
-	//moves the robot
 	public void move(double left, double right){
 		talons.right(right);
 		talons.left(left);
@@ -51,40 +55,30 @@ public class SteamWorksDriveSystem extends PIDSubsystem implements DriveSystem {
 		talons.stop();
 	}
 	
-	//formats and prints the value that the speed controllers are receiving.
 	@Override
 	public void printSpeed(){
 		System.out.printf("%.2f || %.2f\n",talons.getfl(), talons.getfr());
 	}
 	
-	
-	//the speed during teleop is divided by "restraint"
-	//the left and right bumpers lower and raise "restraint" respectively
-	//"restraint" is confined between 10 & 1
 	@Override
 	public void restrain(){
-		if (driveXbox.getButtonRelease(Buttons.LBUMP) && restraint > 1){
+		if (restraint > 1){
 			restraint -= 1;
 		}
-		if (driveXbox.getButtonRelease(Buttons.RBUMP) && restraint < 10){
+		if (restraint < 10){
 			restraint += 1;
 		}
 	}
 	
-	@Override
-	protected double returnPIDInput() {
-		return displacement;
-	}
-
-	@Override
-	protected void usePIDOutput(double output) {
-		angleSpeed = output;
+	public void updateAngleSpeed(){
+		pid.setError(displacement);
+		angleSpeed = pid.getCorrection();
 	}
 	
-	//uses PID to determine the speed it turns
 	@Override
 	public void autoAngle(double current, double desired){
 		displacement = desired - current;
+		updateAngleSpeed();
 		if (current > desired + angleDeadZone){
 			move(-angleSpeed, angleSpeed);
 		}else if(current < desired + angleDeadZone){
@@ -110,25 +104,14 @@ public class SteamWorksDriveSystem extends PIDSubsystem implements DriveSystem {
 		return placingGear;
 	}
 	
-	//updates the value of "restraint"
-	//updates tracking, if tracking then it continues to track
-	//sets each motor to the appropriate speed adjusted by the restraint
 	@Override
-	public void controlledMove(){
+	public void controlledMove(double xAxis, double yAxis){
 		if (!track.isTracking()){
-			restrain();
-			move((driveXbox.getX() + driveXbox.getY()) / restraint, 
-				(driveXbox.getX() - driveXbox.getY()) / restraint);
+			move((xAxis + yAxis) / restraint, 
+				(xAxis - yAxis) / restraint);
 		}else{
 			move(track.track(), -track.track());
 		}
-	}
-
-
-	@Override
-	protected void initDefaultCommand() {
-		// TODO Auto-generated method stub
-		
 	}
 
 }
