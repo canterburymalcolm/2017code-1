@@ -1,32 +1,37 @@
-package org.usfirst.frc.team3328.robot;
+package org.usfirst.frc.team3328.robotTests;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.usfirst.frc.team3328.robot.subsystems.SteamWorksDriveSystem;
+import org.usfirst.frc.team3328.robot.utilities.ADIS16448_IMU;
 import org.usfirst.frc.team3328.robot.utilities.DriveEncoders;
 import org.usfirst.frc.team3328.robot.utilities.DriveTalons;
+import org.usfirst.frc.team3328.robot.utilities.PID;
 import org.usfirst.frc.team3328.robot.utilities.Tracking;
+
+import edu.wpi.first.wpilibj.Encoder;
 
 public class SteamWorksDriveSystemTest {
 	
-	DriveEncoders encoders = new DriveEncoders();
+	DriveEncoders encoders = new DriveEncoders(new Encoder(8,9), new Encoder(6,7));
 	FakeController fakeCont1 = new FakeController();
 	FakeController fakeCont2 = new FakeController();
 	FakeTarget target = new FakeTarget();
-	Tracking track = new Tracking(target, fakeCont2);
 	FakeSpeedController fl = new FakeSpeedController();
 	FakeSpeedController fr = new FakeSpeedController();
 	FakeSpeedController bl = new FakeSpeedController();
 	FakeSpeedController br = new FakeSpeedController();
 	DriveTalons talons = new DriveTalons(fl, fr, bl, br);
-	FakeADIS16448_IMU imu = new FakeADIS16448_IMU();
-	SteamWorksDriveSystem drive = new SteamWorksDriveSystem(encoders, talons, fakeCont1, track);
+	ADIS16448_IMU imu = new ADIS16448_IMU();
+	PID pid = new PID("testPID",0 ,0, 0);
+	Tracking track = new Tracking(target, pid);
+	SteamWorksDriveSystem drive = new SteamWorksDriveSystem(encoders, talons, track, imu, pid);
 
 	@Test
 	public void controlledMove_yLargerThanX_rightMotorTurnsBackwards() {
 		fakeCont1.setY(1);
 		fakeCont1.setX(0);
-		drive.controlledMove();
+		//drive.controlledMove();
 		assertEquals(1.0, (fr.speed),  0);
 	}
 	
@@ -34,7 +39,7 @@ public class SteamWorksDriveSystemTest {
 	public void controlledMove_xLargerThanY_rightMotorTurnsForwards() {
 		fakeCont1.setY(1);
 		fakeCont1.setX(0);
-		drive.controlledMove();
+		//drive.controlledMove();
 		assertEquals(-1.0, (fr.speed),  0);
 	}
 	
