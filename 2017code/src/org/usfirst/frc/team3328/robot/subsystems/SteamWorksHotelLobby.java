@@ -4,21 +4,20 @@ import edu.wpi.first.wpilibj.SpeedController;
 
 public class SteamWorksHotelLobby implements HotelLobby {
 	
-	Shooter shooter;
 	SpeedController belt;
 	
-	public SteamWorksHotelLobby(SpeedController talonController, Shooter sh) {
-		shooter = sh;
-		belt = talonController;
+	public SteamWorksHotelLobby(SpeedController belt) {
+		this.belt = belt;
 	}
 	
 	@Override
-	public void controlBelt() {
-		if (shooter.isMax()){
-			belt.set(1);
-		}else{
-			belt.set(0);
-		}
+	public void runBelt(){
+		belt.set(1);
+	}
+	
+	@Override
+	public void stopBelt(){
+		belt.set(0);
 	}
 
 }
