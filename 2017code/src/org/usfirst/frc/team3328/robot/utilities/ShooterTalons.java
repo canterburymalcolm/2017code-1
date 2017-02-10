@@ -7,9 +7,9 @@ public class ShooterTalons {
 	private SpeedController t1;
 	private SpeedController t2;
 	
-	public ShooterTalons(SpeedController talonController1, SpeedController talonController2){
-		t1 = talonController1;
-		t2 = talonController2;
+	public ShooterTalons(SpeedController t1, SpeedController t2){
+		this.t1 = t1;
+		this.t2 = t2;
 	}
 
 	public void set(double speed){
