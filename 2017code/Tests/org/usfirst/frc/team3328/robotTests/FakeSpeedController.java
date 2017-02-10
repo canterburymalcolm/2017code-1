@@ -1,4 +1,4 @@
-package org.usfirst.frc.team3328.robot;
+package org.usfirst.frc.team3328.robotTests;
 
 import edu.wpi.first.wpilibj.SpeedController;
 
