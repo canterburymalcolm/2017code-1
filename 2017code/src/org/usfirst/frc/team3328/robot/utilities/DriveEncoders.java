@@ -7,9 +7,9 @@ public class DriveEncoders {
 	Encoder right;
 	Encoder left;
 	
-	public DriveEncoders(){
-		right = new Encoder(2,3);
-		left = new Encoder(4,5);
+	public DriveEncoders(Encoder right, Encoder left){
+		this.right = right;
+		this.left = left;
 	}
 	
 	public void reset(){
