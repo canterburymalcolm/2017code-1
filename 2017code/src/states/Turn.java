@@ -31,12 +31,13 @@ public class Turn implements RobotState{
 	}
 	
 	@Override
-	public void run() {
-		System.out.println("turning");
-		while (!inRange()){
+	public boolean run() {
+		if (!inRange()){
 			drive.autoAngle(current, desired);
+			return false;
 		}
-		drive.stop();		
+		drive.stop();	
+		return true;
 	}
 
 }
