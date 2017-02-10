@@ -9,12 +9,12 @@ public class DriveTalons {
 	private SpeedController bl; 
 	private SpeedController br;
 	
-	public DriveTalons(SpeedController talonController1, SpeedController talonController2,
-					   SpeedController talonController3, SpeedController talonController4){
-		fl = talonController1;
-		fr = talonController2;
-		bl = talonController3;
-		br = talonController4;
+	public DriveTalons(SpeedController fl, SpeedController fr,
+					   SpeedController bl, SpeedController br){
+		this.fl = fl;
+		this.fr = fr;
+		this.bl = bl;
+		this.br = br;
 	}
 	
 	public double getfl(){
