@@ -5,12 +5,13 @@ import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
 public class TrackGear implements RobotState{
 
-	DriveSystem drive;
 	Tracking track;
+	DriveSystem drive;
+	double trackSpeed;
 	
-	public TrackGear(DriveSystem dr, Tracking trackingSystem) {
-		drive = dr;
-		track = trackingSystem;
+	public TrackGear(DriveSystem drive) {
+		this.drive = drive;
+		track = drive.getTrack();
 	}
 	
 	@Override
@@ -19,12 +20,14 @@ public class TrackGear implements RobotState{
 	}
 	
 	@Override
-	public void run() {
-		track.track();
-		while (track.getTracking()) {
-			drive.controlledMove();
+	public boolean run() {
+		trackSpeed = track.track();
+		if (track.getTracking()) {
+			drive.move(trackSpeed, -trackSpeed);
+			return false;
 		}
 		drive.stop();
+		return true;
 	}
 
 }
