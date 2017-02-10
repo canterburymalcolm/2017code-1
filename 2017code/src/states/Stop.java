@@ -19,10 +19,11 @@ public class Stop implements RobotState{
 	}
 	
 	@Override
-	public void run() {
+	public boolean run() {
 		drive.move(0, 0);
 		shooter.stop();
 		System.out.println("stopped");
+		return true;
 	}
 
 }
