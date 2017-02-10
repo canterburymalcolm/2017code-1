@@ -1,8 +1,9 @@
-package org.usfirst.frc.team3328.robot;
+package org.usfirst.frc.team3328.robotTests;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.usfirst.frc.team3328.robot.utilities.PID;
 import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
 public class TrackingTest {
@@ -11,7 +12,8 @@ public class TrackingTest {
 	double store;
 	FakeController con = new FakeController();
 	FakeTarget target = new FakeTarget();
-	Tracking track = new Tracking(target, con);
+	PID pid = new PID("TrackingTest", 0, 0, 0);
+	Tracking track = new Tracking(target, pid);
 	
 	@Test
 	public void isTracking_pixelWithinDeadZone_returnsFalse(){
@@ -40,5 +42,15 @@ public class TrackingTest {
 		target.setPixel(250);
 		assertTrue(track.track() > store);
 	}
+	
+	@Test
+	public void track_inverseErrors_inverseCorrection(){
+		target.setPixel(220);
+		store = track.track();
+		target.setPixel(420);
+		assertTrue(track.track() + store == 0);
+	}
+	
+	
 	
 }
