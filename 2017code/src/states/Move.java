@@ -18,13 +18,15 @@ public class Move implements RobotState{
 	}
 	
 	@Override
-	public void run() {
-		System.out.println("moving");
-		while (distanceTraveled < distance){
+	public boolean run() {
+		if (distanceTraveled < distance){
 			distanceTraveled += .01;
 			drive.move(.2, .2);
+			return false;
 		}
 		drive.stop();
+		drive.resetDistance();
+		return true;
 	}
 
 }
