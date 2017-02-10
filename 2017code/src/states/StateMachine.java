@@ -2,6 +2,7 @@ package states;
 
 import java.util.*;
 
+import org.usfirst.frc.team3328.robot.Teleop;
 import org.usfirst.frc.team3328.robot.subsystems.DriveSystem;
 import org.usfirst.frc.team3328.robot.subsystems.HotelLobby;
 import org.usfirst.frc.team3328.robot.subsystems.Shooter;
@@ -10,35 +11,6 @@ import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
 public class StateMachine {
 	
-	//States
-	public enum States {TURN, MOVE, TRACKSHOT, SHOOT, TRACKGEAR, GEAR, STOP};
-	Move move;
-	Turn turn;
-	TrackShot trackShot;
-	Shoot shoot;
-	TrackGear trackGear;
-	Gear gear;
-	Stop stop;
-	
-	//classes to be passed to the states
-	DriveSystem drive;
-	Tracking track;
-	Shooter shooter;
-	HotelLobby belt;
-	IMU imu;
-	
-	//Map of the states and their respective classes
-	Map<States, RobotState> classes = new HashMap<States, RobotState>(){{
-		put(States.MOVE, move);
-		put(States.TURN, turn);
-		put(States.TRACKSHOT, trackShot);
-		put(States.SHOOT, shoot);
-		put(States.TRACKGEAR, trackGear);
-		put(States.GEAR, gear);
-		put(States.STOP, stop);
-	}};
-	
-	//Constants
 	private final double LINELONG = 10;
 	private final double LINESHORT = 3;
 	private final double SHOOTLONG = 10;
@@ -48,7 +20,34 @@ public class StateMachine {
 	private final double GEARMIDDLE = 5;
 	private final double GEARSHORT = 3;
 	
-	//Modes
+	int iteration = 0;
+	double value;
+	boolean newState = false;
+	States state;
+	
+	public enum States {TURN, MOVE, TRACKSHOT, SHOOT, TRACKGEAR, GEAR, STOP};
+	
+	DriveSystem drive;
+	Tracking track;
+	Shooter shooter;
+	HotelLobby belt;
+	IMU imu;
+	
+	Map<States, RobotState> classes = new HashMap<States, RobotState>(){
+		
+		private static final long serialVersionUID = 1368017743131992753L;
+
+	{
+		put(States.MOVE, new Move(drive));
+		put(States.TURN, new Turn(drive, imu));
+		put(States.TRACKSHOT, new TrackShot(drive));
+		put(States.SHOOT, new Shoot(shooter, belt));
+		put(States.TRACKGEAR, new TrackGear(drive));
+		put(States.GEAR, new Gear(drive));
+		put(States.STOP, new Stop(drive, shooter));
+	}};
+
+	
 	List<State> lineStandard = Arrays.asList(
 			new State(States.MOVE, LINELONG),
 			new State(States.STOP, 0));
@@ -150,7 +149,7 @@ public class StateMachine {
 	
 	List<State> mode;
 	
-	public StateMachine(int input, DriveSystem dr, Tracking trackingSystem, Shooter sh, IMU ADIS, HotelLobby lobby){
+	public StateMachine(int input, Teleop teleop){
 		switch (input){
 			case 0:
 				mode = lineStandard;
@@ -215,36 +214,22 @@ public class StateMachine {
 			default:
 				mode = nothing;
 		}
-		drive = dr;
-		track = trackingSystem;
-		shooter = sh;
-		imu = ADIS;
-		belt = lobby;
-		move = new Move(drive);
-		turn = new Turn(drive, imu);
-		trackShot = new TrackShot(drive, track);
-		shoot = new Shoot(shooter, belt);
-		trackGear = new TrackGear(drive, track);
-		gear = new Gear(drive);
-		stop = new Stop(drive, shooter);
-		//createMap();
-	}
-	
-	public void createMap(){
-		classes.put(States.MOVE, move);
-		classes.put(States.TURN, turn);
-		classes.put(States.TRACKSHOT, trackShot);
-		classes.put(States.SHOOT, shoot);
-		classes.put(States.TRACKGEAR, trackGear);
-		classes.put(States.GEAR, gear);
-		classes.put(States.STOP, stop);
+		drive = teleop.getDrive();
+		track = drive.getTrack();
+		shooter = teleop.getShooter();
+		imu = drive.getImu();
+		belt = shooter.getBelt();
 	}
 	
 	public void run(){
-		for(int i = 0; i < mode.size(); i++){
-			System.out.printf("State: %s", mode.get(i).getState());
-			classes.get(mode.get(i).getState()).setValue(mode.get(i).getValue());
-			classes.get(mode.get(i).getState()).run();
+		if (newState){
+			iteration++;
+			state = mode.get(iteration).getState();
+			value = mode.get(iteration).getValue();
+			System.out.printf("State: %s", state);
+		}else {
+			classes.get(state).setValue(value);
+			newState = classes.get(state).run();
 		}
 	}
 }
