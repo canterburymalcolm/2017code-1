@@ -1,19 +1,22 @@
 package org.usfirst.frc.team3328.robot.subsystems;
 
+import org.usfirst.frc.team3328.robot.utilities.ADIS16448_IMU;
+import org.usfirst.frc.team3328.robot.utilities.Tracking;
+
 public interface DriveSystem {
 	
 	boolean placingGear();
 	
+	ADIS16448_IMU getImu();
+	
+	Tracking getTrack();
+	
 	void resetDistance();
 	
-	//formats and prints the value that the speed controllers are receiving.
 	void printSpeed();
 	
 	void stop();
 
-	//Uses the gyro to turn until it reaches a desired angle.
-	//should work while moving and while stopped
-	//the speed of each side is separately adjusted using the displacement
 	void autoAngle(double current, double desired);
 	
 	void restrain();
@@ -21,9 +24,7 @@ public interface DriveSystem {
 	void move(double left, double right);
 	
 	void placeGear();
-	
-	//updates the value of "restraint"
-	//sets each motor to the appropriate speed adjusted by the restraint
-	void controlledMove();
+
+	void controlledMove(double xAxis, double yAxis);
 
 }
