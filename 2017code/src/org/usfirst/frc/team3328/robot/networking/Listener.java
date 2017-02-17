@@ -13,13 +13,14 @@ public class Listener implements Runnable, ITableListener {
 	NetworkTable table;
 	double angle = 0;
 	double distance = 0;
+	double time = 0;
 	
 	public Listener(){
 	}
 	
-	public Listener(String name, Target object){
+	public Listener(String name, Target target){
 		listener = new Thread(this, name);
-		target = object;
+		this.target = target;
 		NetworkTable.shutdown();
 		NetworkTable.setClientMode();
 		NetworkTable.initialize();
@@ -32,20 +33,18 @@ public class Listener implements Runnable, ITableListener {
 	
 	@Override
 	public void valueChanged(ITable source, String key, Object value, boolean isNew) {
-		target.setStatus(isNew);
-		target.setTime(System.nanoTime());
+		target.setStatus(true);
+		time = System.currentTimeMillis();
 		if (key.equals("pixels")){
-			System.out.printf("pixel: %06.2f\n", table.getNumber("pixels", 0.0));
+			//System.out.printf("pixel: %06.2f\n", table.getNumber("pixels", 0.0));
 			target.setPixel(table.getNumber("pixels", 0.0)); 
 		}
 	}
 
 	public void run(){
 		for(;;){
-			try{
-				Thread.sleep(500);
-			}catch(Exception e){
-				
+			if (System.currentTimeMillis() - time > 1000){
+				target.setStatus(false);
 			}
 		}
 	}
