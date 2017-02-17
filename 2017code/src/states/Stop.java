@@ -15,15 +15,14 @@ public class Stop implements RobotState{
 	
 	@Override
 	public void setValue(double val){
-		
+		System.out.println("stopped");
 	}
 	
 	@Override
 	public boolean run() {
 		drive.move(0, 0);
 		shooter.stop();
-		System.out.println("stopped");
-		return true;
+		return false;
 	}
 
 }

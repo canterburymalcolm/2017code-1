@@ -11,7 +11,7 @@ public class TrackShot implements RobotState {
 	
 	public TrackShot(DriveSystem drive){
 		this.drive = drive;
-		track = drive.getTrack();
+		track = this.drive.getTrack();
 	}
 	
 	@Override
@@ -22,7 +22,7 @@ public class TrackShot implements RobotState {
 	@Override
 	public boolean run() {
 		trackSpeed = track.track();
-		if (track.getTracking()){
+		if (track.isTracking()){
 			drive.move(trackSpeed, -trackSpeed);
 			return false;
 		}
