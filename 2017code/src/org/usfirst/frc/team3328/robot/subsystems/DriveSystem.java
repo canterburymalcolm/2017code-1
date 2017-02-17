@@ -1,6 +1,7 @@
 package org.usfirst.frc.team3328.robot.subsystems;
 
 import org.usfirst.frc.team3328.robot.utilities.ADIS16448_IMU;
+import org.usfirst.frc.team3328.robot.utilities.DriveTalons;
 import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
 public interface DriveSystem {
@@ -13,13 +14,19 @@ public interface DriveSystem {
 	
 	void resetDistance();
 	
+	double getDistance();
+	
 	void printSpeed();
 	
 	void stop();
 
 	void autoAngle(double current, double desired);
 	
-	void restrain();
+	DriveTalons getTalons();
+	
+	void upRestraint();
+	
+	void downRestraint();
 	
 	void move(double left, double right);
 	
