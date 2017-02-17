@@ -8,6 +8,10 @@ import org.usfirst.frc.team3328.robot.utilities.Controller;
 import org.usfirst.frc.team3328.robot.utilities.SteamWorksXbox.Buttons;
 import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
+import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.Relay.Value;
+
 public class Teleop {
 	
 	DriveSystem drive;
@@ -16,7 +20,7 @@ public class Teleop {
 	Climber climb;
 	Controller utilXbox;
 	Controller driveXbox;
-	Tracking track = drive.getTrack();
+	Tracking track;
 	
 	public Teleop(DriveSystem drive, Shooter shoot, Feeder feed, Climber climb,
 				Controller utilXbox, Controller driveXbox){
@@ -26,16 +30,20 @@ public class Teleop {
 		this.climb = climb;
 		this.utilXbox = utilXbox;
 		this.driveXbox = driveXbox;
+		track = this.drive.getTrack();
 	}
 	
 	public void run(){
 		//tracking
-		if (utilXbox.getButtonRelease(Buttons.LBUMP)){
+		if (driveXbox.getButtonRelease(Buttons.A)){
 			track.toggleTracking();
 		}
 		//driving
 		if (driveXbox.getButtonRelease(Buttons.LBUMP)){
-			drive.restrain();
+			drive.upRestraint();
+		}
+		if (driveXbox.getButtonRelease(Buttons.RBUMP)){
+			drive.downRestraint();
 		}
 		drive.controlledMove(driveXbox.getX(), driveXbox.getY());
 		//shooting
