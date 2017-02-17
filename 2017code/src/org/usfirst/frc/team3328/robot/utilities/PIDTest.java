@@ -10,7 +10,7 @@ public class PIDTest {
 	double KD;
 	double error;
 	double deltaError;
-	double prevError = error;
+	double prevError = 0;
 	double integralError;
 	double correction;
 	double timeChange;
@@ -54,22 +54,20 @@ public class PIDTest {
 	public double getCorrection(){
 		long now = System.nanoTime();
 		timeChange = (double)(now - lastTime);
+		timeChange /= 1000000000;
 		
-		deltaError = (prevError - error);
+		deltaError = (prevError - error) / timeChange;
 		
-		integralError += (error / 100);
+		integralError += (error * timeChange);
 		
 		pOut = error * KP;
 		iOut = integralError * KI;
 		dOut = deltaError * KD;
 		
 		correction = pOut + iOut + dOut;
-//		if (correction > 500){
-//			correction = 500;
-//		}
-//		if (correction < -250){
-//			correction = -250;
-//		}
+		
+		lastTime = now;
+		prevError = error;
 		
 		return correction;
 	}
