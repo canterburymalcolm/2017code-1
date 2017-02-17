@@ -2,20 +2,25 @@ package org.usfirst.frc.team3328.robot.utilities;
 
 import org.usfirst.frc.team3328.robot.networking.Target;
 
+import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.Relay.Value;
+
 public class Tracking {
 	
+	Relay spike;
 	Target target;
 	Controller utilXbox;
-	PID pid;
+	PIDTest pid;
 	private double pixel;
 	private double trackSpeed;
-	private double goal;
-	private int deadZone = 10;
-	private boolean tracking;
+	private double goal = 320;
+	private int deadZone = 5;
+	private boolean tracking = false;
 	
-	public Tracking(Target target, PID pid){
+	public Tracking(Target target, PIDTest pid){
 		this.target = target;
 		this.pid = pid;
+		spike = new Relay(0);
 	}
 	
 	public void setGoal(int target){
@@ -26,18 +31,32 @@ public class Tracking {
 		return goal;
 	}
 	
-	public boolean getTracking(){
+	public boolean toggleTracking(){
+		if (!tracking){
+			tracking = true;
+		}else{
+			tracking = false; 
+		}
 		return tracking;
 	}
 	
-	public void toggleTracking(){
-		tracking = !tracking;
+	public void updateTracking(){
+//		if(!target.getStatus()){
+//			tracking = false;
+//		}
+		if (Math.abs(pixel - goal) < deadZone){
+			tracking = false;
+		}
 	}
 	
 	public boolean isTracking(){
-		if (pixel < goal + deadZone && pixel > goal - deadZone){
-			tracking = false;
+		if (tracking){
+			spike.set(Value.kForward);
+		}else{
+			spike.set(Value.kOff);
 		}
+		pixel = target.getPixel();
+		System.out.println("Status: " + target.getStatus() + "| Pixel: " + pixel + "| Track: " + tracking);
 		return tracking;
 	}	
 	
@@ -48,7 +67,7 @@ public class Tracking {
 	
 	public double track(){
 		pixel = target.getPixel();
-		tracking = true;
+		updateTracking();
 		updateTrackSpeed();
 		if (pixel > goal + deadZone){
 			return trackSpeed;
