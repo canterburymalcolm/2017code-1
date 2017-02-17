@@ -10,17 +10,19 @@ public class DriveEncoders {
 	public DriveEncoders(Encoder right, Encoder left){
 		this.right = right;
 		this.left = left;
+		this.right.setReverseDirection(true);
+		this.left.setReverseDirection(false);
 	}
 	
 	public void reset(){
-		/*fr.reset();
-		fl.reset();
-		br.reset();
-		bl.reset();*/
+		right.reset();
+		left.reset();
 	}
 	
 	public double getDistance(){
-		return (rightDistance() + leftDistance()) / 2;
+		//return (rightDistance() + leftDistance()) / 2;
+		//System.out.printf("Right: %f || Left: %f\n", rightDistance(), leftDistance());
+		return rightDistance();
 	}
 	
 	public double getOffset(){
