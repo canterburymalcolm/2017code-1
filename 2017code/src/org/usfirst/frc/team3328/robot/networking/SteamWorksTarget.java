@@ -14,15 +14,15 @@ public class SteamWorksTarget implements Target {
 	}
 	
 	@Override
-	public void setPixel(double ang){
+	public void setPixel(double pixel){
 		//System.out.println("set pixel to " + ang);
 		//pixel.set(ang);
-		pixel = ang;
+		this.pixel = pixel;
 	}
 	
 	@Override
-	public void setStatus(boolean stat){
-		status = stat;
+	public void setStatus(boolean status){
+		this.status = status;
 	}
 	
 	@Override
@@ -31,8 +31,8 @@ public class SteamWorksTarget implements Target {
 	}
 	
 	@Override
-	public void setTime(long stamp){
-		time = stamp;
+	public void setTime(long time){
+		this.time = time;
 	}
 	
 	@Override
@@ -47,6 +47,6 @@ public class SteamWorksTarget implements Target {
 	
 	@Override
 	public void printValues(){
-		System.out.printf("Pixel: %06.2f\n", getPixel());
+		System.out.printf("Pixel: %06.2f|Status: %b\n", getPixel(), getStatus());
 	}
 }
