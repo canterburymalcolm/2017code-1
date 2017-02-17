@@ -57,7 +57,7 @@ public class SteamWorksDriveSystem implements DriveSystem {
 		talons.left(left);
 	}
 	
-	public double sinMove(double position){
+	public double calculateSpeed(double position){
 		return (Math.sin(position - (Math.PI / 2)) + 1) * 2; 
 	}
 	
@@ -127,11 +127,15 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	
 	@Override
 	public void controlledMove(double xAxis, double yAxis){
+		double x = calculateSpeed(xAxis);
+		double y = calculateSpeed(yAxis);
 		if (!track.isTracking()){
-			move((xAxis + yAxis) / restraint, 
-				(xAxis - yAxis) / restraint);
+			move((x + y) / restraint, 
+				(x - y) / restraint);
 		}else{
-			move(track.track(), -track.track());
+			double turn = track.track();
+			double move = track.getMovement();
+			move(turn + move, -turn + move);
 		}
 	}
 
