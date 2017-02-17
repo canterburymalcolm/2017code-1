@@ -20,12 +20,12 @@ public class StateMachine {
 	private final double GEARMIDDLE = 5;
 	private final double GEARSHORT = 3;
 	
-	int iteration = 0;
+	int iteration = -1;
 	double value;
-	boolean newState = false;
+	boolean newState = true;
 	States state;
 	
-	public enum States {TURN, MOVE, TRACKSHOT, SHOOT, TRACKGEAR, GEAR, STOP};
+	public enum States {WAIT, TURN, ENCODERTURN, MOVE, TRACKSHOT, SHOOT, TRACKGEAR, GEAR, STOP};
 	
 	DriveSystem drive;
 	Tracking track;
@@ -33,7 +33,7 @@ public class StateMachine {
 	HotelLobby belt;
 	IMU imu;
 	
-	Map<States, RobotState> classes = new HashMap<States, RobotState>(){
+	Map<States, RobotState> classes = new HashMap<States, RobotState>()/*{
 		
 		private static final long serialVersionUID = 1368017743131992753L;
 
@@ -45,7 +45,7 @@ public class StateMachine {
 		put(States.TRACKGEAR, new TrackGear(drive));
 		put(States.GEAR, new Gear(drive));
 		put(States.STOP, new Stop(drive, shooter));
-	}};
+	}}*/;
 
 	
 	List<State> lineStandard = Arrays.asList(
@@ -143,7 +143,26 @@ public class StateMachine {
 			new State(States.MOVE, GEARSHORT),
 			new State(States.TRACKGEAR, 0),
 			new State(States.GEAR, 0));
-	List<State> custom = Arrays.asList();
+	List<State> custom1 = Arrays.asList(
+			new State(States.MOVE, 225),
+			new State(States.MOVE, 450),
+			new State(States.MOVE, 450),
+			new State(States.TURN, 175),
+			new State(States.MOVE, 450),
+			new State(States.MOVE, 450),
+			new State(States.MOVE, 225),
+			new State(States.STOP, 0));
+	List<State> custom2 = Arrays.asList(
+			new State(States.MOVE, 450),
+			new State(States.TURN, 355),
+			new State(States.MOVE, 450),
+			new State(States.TURN, 175),
+			new State(States.MOVE, 450),
+			new State(States.TURN, 355),
+			new State(States.STOP, 0));
+	List<State> custom3 = Arrays.asList(
+			new State(States.TURN, 90),
+			new State(States.STOP, 0));
 	List<State> nothing = Arrays.asList(
 			new State(States.STOP, 0));
 	
@@ -206,11 +225,16 @@ public class StateMachine {
 				mode = gearBR;
 				break;
 			case 18:
-				mode = custom;
+				mode = custom1;
 				break;
 			case 19:
-				mode = nothing;
+				mode = custom2;
 				break;
+			case 20:
+				mode = custom3;
+				break;
+			case 21:
+				mode = nothing;
 			default:
 				mode = nothing;
 		}
@@ -219,6 +243,21 @@ public class StateMachine {
 		shooter = teleop.getShooter();
 		imu = drive.getImu();
 		belt = shooter.getBelt();
+		classes.put(States.WAIT,  new Wait());
+		classes.put(States.MOVE, new Move(drive));
+		classes.put(States.TURN, new Turn(drive, imu));
+		classes.put(States.ENCODERTURN, new EncoderTurn(drive));
+		classes.put(States.TRACKSHOT, new TrackShot(drive));
+		classes.put(States.SHOOT, new Shoot(shooter, belt));
+		classes.put(States.TRACKGEAR, new TrackGear(drive));
+		classes.put(States.GEAR, new Gear(drive));
+		classes.put(States.STOP, new Stop(drive, shooter));
+	}
+	
+	public void reset(){
+		iteration = -1;
+		drive.stop();
+		newState = true;
 	}
 	
 	public void run(){
@@ -226,9 +265,10 @@ public class StateMachine {
 			iteration++;
 			state = mode.get(iteration).getState();
 			value = mode.get(iteration).getValue();
-			System.out.printf("State: %s", state);
-		}else {
 			classes.get(state).setValue(value);
+			System.out.printf("State: %s\n", state.toString());
+			newState = false;
+		}else {
 			newState = classes.get(state).run();
 		}
 	}
