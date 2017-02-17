@@ -25,8 +25,7 @@ public class SteamWorksShooter implements Shooter {
 	
 	@Override
 	public boolean isEmpty(){
-		//returns true if hotel is empty
-		return true;
+		return false;
 	}
 	
 	@Override
@@ -34,7 +33,6 @@ public class SteamWorksShooter implements Shooter {
 		return encoder.get() >= 1000;
 	}
 	
-	// Gradually builds up speed to max
 	@Override
 	public void maxSpeed(){
 		if (speed < .75){
@@ -43,7 +41,6 @@ public class SteamWorksShooter implements Shooter {
 		talons.set(speed);
 	}
 	
-	// Sets talons and speed to 0
 	@Override
 	public void stop(){
 		if (speed > 0){
@@ -57,9 +54,6 @@ public class SteamWorksShooter implements Shooter {
 		active = !active;
 	}
 	
-	// Method to check whether the button
-	// is pressed and sets the talons to
-	// max speed whether or not.
 	@Override
 	public void shooterControl(){	
 		if (active){
