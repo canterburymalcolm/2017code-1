@@ -12,8 +12,11 @@ public class Tracking {
 	Controller utilXbox;
 	PIDTest pid;
 	private double pixel;
+	private double distance;
 	private double trackSpeed;
-	private double goal = 320;
+	private double movement = 0;
+	private double pixelGoal = 320;
+	private double distanceGoal = 200;
 	private int deadZone = 5;
 	private boolean tracking = false;
 	
@@ -24,28 +27,36 @@ public class Tracking {
 	}
 	
 	public void setGoal(int target){
-		goal = target;
+		pixelGoal = target;
 	}
 	
 	public double getGoal(){
-		return goal;
+		return pixelGoal;
 	}
 	
 	public boolean toggleTracking(){
-		if (!tracking){
-			tracking = true;
-		}else{
-			tracking = false; 
-		}
+		tracking = !tracking;
 		return tracking;
 	}
 	
+	public double getMovement(){
+		return movement;
+	}
+	
 	public void updateTracking(){
+		pixel = target.getPixel();
+		distance = target.getDistance();
 //		if(!target.getStatus()){
 //			tracking = false;
 //		}
-		if (Math.abs(pixel - goal) < deadZone){
-			tracking = false;
+		if (Math.abs(pixel - pixelGoal) < deadZone){
+			movement = -.2;
+		}
+		if (distance < distanceGoal){
+			movement = 0;
+			if (Math.abs(pixel - pixelGoal) < deadZone){
+				tracking = false;
+			}
 		}
 	}
 	
@@ -56,22 +67,21 @@ public class Tracking {
 			spike.set(Value.kOff);
 		}
 		pixel = target.getPixel();
-		System.out.println("Status: " + target.getStatus() + "| Pixel: " + pixel + "| Track: " + tracking);
+		//System.out.println("Status: " + target.getStatus() + "| Pixel: " + pixel + "| Distance: " + target.getDistance() + " | Track: " + tracking);
 		return tracking;
 	}	
 	
 	public void updateTrackSpeed(){
-		pid.setError(pixel - goal);
+		pid.setError(pixel - pixelGoal);
 		trackSpeed = pid.getCorrection();
 	}
 	
 	public double track(){
-		pixel = target.getPixel();
 		updateTracking();
 		updateTrackSpeed();
-		if (pixel > goal + deadZone){
+		if (pixel > pixelGoal + deadZone){
 			return trackSpeed;
-		}else if (pixel < goal - deadZone){
+		}else if (pixel < pixelGoal - deadZone){
 			return -trackSpeed;
 		}else{
 			return 0;
