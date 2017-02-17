@@ -17,6 +17,10 @@ public class DriveTalons {
 		this.br = br;
 	}
 	
+	public SpeedController getTalon(){
+		return fl;
+	}
+	
 	public double getfl(){
 		return fl.get();
 	}
