@@ -46,7 +46,7 @@ public class SteamWorksDriveSystemTest {
 	@Test
 	public void restrain_LBumperIsPressed_restraintIncrementedBy1(){
 		fakeCont1.setlBump(true);
-		drive.restrain();
+		//drive.restrain();
 		assertTrue(drive.restraint == 2);
 	}
 	

@@ -10,11 +10,12 @@ public class PIDTest {
 	double KD;
 	double error;
 	double deltaError;
-	double prevError = 0;
-	double integralError;
+	double prevError;
+	double integralError = 0;
 	double correction;
 	double timeChange;
 	long lastTime;
+	boolean firstTime = true;
 	
 	public PIDTest(double P, double I, double D){
 		KP = P;
@@ -49,6 +50,10 @@ public class PIDTest {
 	public void setError(double error){
 		this.error = error;
 		this.error /= 360;
+		if (firstTime){
+			prevError = error;
+			firstTime = false;
+		}
 	}
 	
 	public double getCorrection(){
@@ -58,7 +63,8 @@ public class PIDTest {
 		
 		deltaError = (prevError - error) / timeChange;
 		
-		integralError += (error * timeChange);
+		integralError += (error * timeChange) / 10;
+		System.out.println(integralError);
 		
 		pOut = error * KP;
 		iOut = integralError * KI;

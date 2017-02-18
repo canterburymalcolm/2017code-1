@@ -15,7 +15,7 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	private DriveEncoders encoders;
 	public double restraint = 1;
 	public double displacement;
-	private double angleDeadZone = 0;
+	private double angleDeadZone = 2;
 	private double angleSpeed = .08;
 	private double gearSpeed = .1;
 	boolean placingGear = false;
@@ -58,7 +58,13 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	}
 	
 	public double calculateSpeed(double position){
-		return (Math.sin(position - (Math.PI / 2)) + 1) * 2; 
+		if (position >= 0){
+			return (Math.sin(position - (Math.PI / 2)) + 1) * 2; 
+		}else{
+			position *= -1;
+			position = (Math.sin(position - (Math.PI / 2)) + 1) * 2;
+			return position *= -1;
+		}
 	}
 	
 	@Override
@@ -92,17 +98,10 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	
 	@Override
 	public void autoAngle(double current, double desired){
-	displacement = desired - current;
+		displacement = desired - current;
 		updateAngleSpeed();
-		//System.out.println(angleSpeed);
-		move(-angleSpeed, angleSpeed);
-		if (current > desired + angleDeadZone){
-			move(-angleSpeed, angleSpeed);
-		}else if(current < desired + angleDeadZone){
-			move(angleSpeed, -angleSpeed);
-		}else{
-			stop();
-		}
+		System.out.printf("Current: %.2f |Desired: %.2f\n", current, desired);
+		move(angleSpeed, -angleSpeed);
 	}
 	
 	public DriveTalons getTalons(){

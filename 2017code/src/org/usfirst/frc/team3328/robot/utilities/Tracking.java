@@ -16,7 +16,7 @@ public class Tracking {
 	private double trackSpeed;
 	private double movement = 0;
 	private double pixelGoal = 320;
-	private double distanceGoal = 200;
+	private double distanceGoal = 100;
 	private int deadZone = 5;
 	private boolean tracking = false;
 	
@@ -49,7 +49,7 @@ public class Tracking {
 //		if(!target.getStatus()){
 //			tracking = false;
 //		}
-		if (Math.abs(pixel - pixelGoal) < deadZone){
+		if (Math.abs(pixel - pixelGoal) < deadZone && distance > distanceGoal){
 			movement = -.2;
 		}
 		if (distance < distanceGoal){
@@ -67,7 +67,7 @@ public class Tracking {
 			spike.set(Value.kOff);
 		}
 		pixel = target.getPixel();
-		//System.out.println("Status: " + target.getStatus() + "| Pixel: " + pixel + "| Distance: " + target.getDistance() + " | Track: " + tracking);
+		System.out.println("Status: " + target.getStatus() + "| Pixel: " + pixel + "| Distance: " + target.getDistance() + " | Track: " + tracking);
 		return tracking;
 	}	
 	
@@ -79,10 +79,8 @@ public class Tracking {
 	public double track(){
 		updateTracking();
 		updateTrackSpeed();
-		if (pixel > pixelGoal + deadZone){
+		if (Math.abs(pixel - pixelGoal) > deadZone){
 			return trackSpeed;
-		}else if (pixel < pixelGoal - deadZone){
-			return -trackSpeed;
 		}else{
 			return 0;
 		}

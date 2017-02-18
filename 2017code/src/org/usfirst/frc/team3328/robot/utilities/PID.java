@@ -7,7 +7,7 @@ public class PID extends PIDSubsystem{
 	double error;
 	double correction;
 	
-	public PID(String name, int P, int I, int D){
+	public PID(String name, double P, double I, double D){
 		super(name, P, I, D);
 		setAbsoluteTolerance(0.05);
 		getPIDController().setContinuous(false);
@@ -23,7 +23,7 @@ public class PID extends PIDSubsystem{
 	
 	@Override
 	protected double returnPIDInput() {
-		// TODO Auto-generated method stub
+		System.out.println("error: " + error);
 		return error;
 	}
 

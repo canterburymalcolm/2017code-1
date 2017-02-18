@@ -13,7 +13,7 @@ public class Turn implements RobotState{
 	Timer timer;
 	DriveSystem drive;
 	IMU imu;
-	double range = .5;
+	double range = 2;
 	double current;
 	double desired;
 	

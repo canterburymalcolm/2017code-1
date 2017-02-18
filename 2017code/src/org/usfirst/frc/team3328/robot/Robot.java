@@ -36,7 +36,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		xbox = new SteamWorksXbox(1);
-		pid = new PIDTest(0 ,0, 0);
+		pid = new PIDTest(1.5 ,0, 0);
 		telop = new Teleop(
 				new SteamWorksDriveSystem(
 					new DriveEncoders(

@@ -35,7 +35,7 @@ public class Listener implements Runnable, ITableListener {
 	public void valueChanged(ITable source, String key, Object value, boolean isNew) {
 		target.setStatus(true);
 		time = System.currentTimeMillis();
-		System.out.printf("Pixels: %f |Distance: %f\n", table.getNumber("pixels", 0.0), table.getNumber("distance", 0.0));
+		//System.out.printf("Pixels: %f |Distance: %f\n", table.getNumber("pixels", 0.0), table.getNumber("distance", 0.0));
 		if (key.equals("pixels")){
 			target.setPixel(table.getNumber("pixels", 0.0)); 
 		}
