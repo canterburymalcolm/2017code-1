@@ -1,6 +1,6 @@
 package org.usfirst.frc.team3328.robot.utilities;
 
-public class PIDTest {
+public class PID {
 	
 	double pOut;
 	double iOut;
@@ -17,7 +17,7 @@ public class PIDTest {
 	long lastTime;
 	boolean firstTime = true;
 	
-	public PIDTest(double P, double I, double D){
+	public PID(double P, double I, double D){
 		KP = P;
 		KI = I;
 		KD = D;
@@ -56,6 +56,12 @@ public class PIDTest {
 		}
 	}
 	
+	public void reset() {
+		deltaError = 0;
+		integralError = 0;
+		firstTime = true;
+	}
+	
 	public double getCorrection(){
 		long now = System.nanoTime();
 		timeChange = (double)(now - lastTime);
@@ -63,12 +69,14 @@ public class PIDTest {
 		
 		deltaError = (prevError - error) / timeChange;
 		
-		integralError += (error * timeChange) / 10;
+		integralError += (error * timeChange);
 		System.out.println(integralError);
 		
 		pOut = error * KP;
 		iOut = integralError * KI;
 		dOut = deltaError * KD;
+		
+		System.out.println("Iout " + iOut);
 		
 		correction = pOut + iOut + dOut;
 		
