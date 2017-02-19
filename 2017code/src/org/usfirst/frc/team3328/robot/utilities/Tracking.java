@@ -10,80 +10,85 @@ public class Tracking {
 	Relay spike;
 	Target target;
 	Controller utilXbox;
-	PIDTest pid;
+	PID pidAngle;
+	PID pidDistance;
 	private double pixel;
 	private double distance;
-	private double trackSpeed;
-	private double movement = 0;
+	private double move = 0;
 	private double pixelGoal = 320;
 	private double distanceGoal = 100;
-	private int deadZone = 5;
+	private double pixelDeadZone = 2;
+	private double distanceDeadZone = 5;
 	private boolean tracking = false;
 	
-	public Tracking(Target target, PIDTest pid){
+	public Tracking(Target target, Relay spike, PID pidAngle, PID pidDistance){
 		this.target = target;
-		this.pid = pid;
-		spike = new Relay(0);
+		this.pidAngle = pidAngle;
+		this.pidDistance = pidDistance;
+		this.spike = spike;
 	}
 	
 	public void setGoal(int target){
 		pixelGoal = target;
 	}
-	
-	public double getGoal(){
-		return pixelGoal;
-	}
-	
-	public boolean toggleTracking(){
+		
+	public void toggleTracking(){
 		tracking = !tracking;
-		return tracking;
-	}
-	
-	public double getMovement(){
-		return movement;
-	}
-	
-	public void updateTracking(){
-		pixel = target.getPixel();
-		distance = target.getDistance();
-//		if(!target.getStatus()){
-//			tracking = false;
-//		}
-		if (Math.abs(pixel - pixelGoal) < deadZone && distance > distanceGoal){
-			movement = -.2;
-		}
-		if (distance < distanceGoal){
-			movement = 0;
-			if (Math.abs(pixel - pixelGoal) < deadZone){
-				tracking = false;
-			}
-		}
-	}
-	
-	public boolean isTracking(){
 		if (tracking){
 			spike.set(Value.kForward);
 		}else{
 			spike.set(Value.kOff);
 		}
-		pixel = target.getPixel();
-		System.out.println("Status: " + target.getStatus() + "| Pixel: " + pixel + "| Distance: " + target.getDistance() + " | Track: " + tracking);
-		return tracking;
-	}	
-	
-	public void updateTrackSpeed(){
-		pid.setError(pixel - pixelGoal);
-		trackSpeed = pid.getCorrection();
 	}
 	
-	public double track(){
-		updateTracking();
-		updateTrackSpeed();
-		if (Math.abs(pixel - pixelGoal) > deadZone){
-			return trackSpeed;
+	public void stopTracking(){
+		tracking = false;
+		spike.set(Value.kOff);
+	}
+	
+	public void updateTracking(){
+		pixel = target.getPixel();
+		distance = target.getDistance();
+		double pixelDisplacement = Math.abs(pixel - pixelGoal);
+		double moveDisplacement = Math.abs(distance - distanceGoal);
+		if (target.foundTarget()){
+			if (pixelDisplacement < pixelDeadZone){
+				move = updateMove(distance - distanceGoal);
+				if (moveDisplacement < distanceDeadZone){
+					move = 0;
+					stopTracking();
+				}
+			}else{
+				move = 0;
+			}
 		}else{
-			return 0;
+			stopTracking();
 		}
+	}
+	
+	public boolean getTracking(){
+		updateTracking();
+		System.out.printf("Status: %b |Tracking: %b |Pixel %f |Distance: %.2f\n", 
+				target.foundTarget(), tracking, pixel, target.getDistance());
+		return tracking;
+	}	
+
+	public double updateMove(double error) {
+		pidDistance.setError(error);
+		return pidDistance.getCorrection();
+	}
+	
+	public double getMove(){
+		return move; 
+	}
+	
+	public double updateTurn(double error){
+		pidAngle.setError(error);
+		return pidAngle.getCorrection();
+	}
+	
+	public double getTurn(){
+		return updateTurn(pixel - pixelGoal);
 	}
 	
 }
