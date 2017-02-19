@@ -3,25 +3,24 @@ package org.usfirst.frc.team3328.robot.subsystems;
 import org.usfirst.frc.team3328.robot.utilities.ADIS16448_IMU;
 import org.usfirst.frc.team3328.robot.utilities.DriveEncoders;
 import org.usfirst.frc.team3328.robot.utilities.DriveTalons;
-import org.usfirst.frc.team3328.robot.utilities.PIDTest;
+import org.usfirst.frc.team3328.robot.utilities.PID;
 import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
 public class SteamWorksDriveSystem implements DriveSystem {
 	
 	Tracking track;
 	ADIS16448_IMU imu;
-	PIDTest  pid;
+	PID  pid;
 	private DriveTalons talons;
 	private DriveEncoders encoders;
 	public double restraint = 1;
 	public double displacement;
-	private double angleDeadZone = 2;
 	private double angleSpeed = .08;
 	private double gearSpeed = .1;
 	boolean placingGear = false;
 	
 	public SteamWorksDriveSystem(DriveEncoders encoders, DriveTalons talons, 
-								Tracking track, ADIS16448_IMU imu, PIDTest pid){
+								Tracking track, ADIS16448_IMU imu, PID pid){
 		this.encoders = encoders;
 		this.talons = talons;
 		this.track = track;
@@ -104,10 +103,6 @@ public class SteamWorksDriveSystem implements DriveSystem {
 		move(angleSpeed, -angleSpeed);
 	}
 	
-	public DriveTalons getTalons(){
-		return talons;
-	}
-	
 	@Override
 	public void placeGear(){
 		placingGear = true;
@@ -120,21 +115,26 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	}
 	
 	@Override
-	public boolean placingGear(){
+	public boolean getPlacingGear(){
 		return placingGear;
+	}
+
+	public void trackingMove(){
+		double turn = track.getTurn();
+		double move = track.getMove();
+		move(turn + move, -turn + move);
+
 	}
 	
 	@Override
 	public void controlledMove(double xAxis, double yAxis){
 		double x = calculateSpeed(xAxis);
 		double y = calculateSpeed(yAxis);
-		if (!track.isTracking()){
+		if (!track.getTracking()){
 			move((x + y) / restraint, 
 				(x - y) / restraint);
 		}else{
-			double turn = track.track();
-			double move = track.getMovement();
-			move(turn + move, -turn + move);
+			trackingMove();
 		}
 	}
 

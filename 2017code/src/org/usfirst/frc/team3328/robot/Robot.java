@@ -10,7 +10,7 @@ import org.usfirst.frc.team3328.robot.utilities.ADIS16448_IMU;
 import org.usfirst.frc.team3328.robot.utilities.Controller;
 import org.usfirst.frc.team3328.robot.utilities.DriveEncoders;
 import org.usfirst.frc.team3328.robot.utilities.DriveTalons;
-import org.usfirst.frc.team3328.robot.utilities.PIDTest;
+import org.usfirst.frc.team3328.robot.utilities.PID;
 import org.usfirst.frc.team3328.robot.utilities.REVDigitBoard;
 import org.usfirst.frc.team3328.robot.utilities.ShooterTalons;
 import org.usfirst.frc.team3328.robot.utilities.SteamWorksXbox;
@@ -21,6 +21,7 @@ import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Talon;
 import states.StateMachine;
 
@@ -29,14 +30,14 @@ public class Robot extends IterativeRobot {
 	StateMachine auto;
 	REVDigitBoard digit;  
 	Controller xbox;
-	PIDTest pid;
+	PID pid;
 	boolean autoActive = false;
 
 
 	@Override
 	public void robotInit() {
 		xbox = new SteamWorksXbox(1);
-		pid = new PIDTest(1.5 ,0, 0);
+		pid = new PID(1.5 ,0, 0);
 		telop = new Teleop(
 				new SteamWorksDriveSystem(
 					new DriveEncoders(
@@ -49,7 +50,9 @@ public class Robot extends IterativeRobot {
 						new Talon(3)),
 					new Tracking(
 						new NetworkTablesTargetProvider().getTarget(),
-						new PIDTest(.5 ,.05 ,0)),
+						new Relay(0),
+						new PID(.5 ,.05 ,0),
+						new PID(0, 0, 0)),
 					new ADIS16448_IMU(),
 					pid),
 				new SteamWorksShooter(
@@ -117,6 +120,7 @@ public class Robot extends IterativeRobot {
 			}
 		}
 		if (autoActive){
+			pid.reset();
 			auto.run();
 		}else{
 			auto.reset();
