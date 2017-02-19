@@ -17,7 +17,7 @@ public class Gear implements RobotState{
 	
 	@Override
 	public boolean run() {
-		if(drive.placingGear()){
+		if(drive.getPlacingGear()){
 			drive.placeGear();
 			return false;
 		}
