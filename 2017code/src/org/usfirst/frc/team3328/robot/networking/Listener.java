@@ -33,7 +33,7 @@ public class Listener implements Runnable, ITableListener {
 	
 	@Override
 	public void valueChanged(ITable source, String key, Object value, boolean isNew) {
-		target.setStatus(true);
+		target.setFoundRect(true);
 		time = System.currentTimeMillis();
 		//System.out.printf("Pixels: %f |Distance: %f\n", table.getNumber("pixels", 0.0), table.getNumber("distance", 0.0));
 		if (key.equals("pixels")){
@@ -47,7 +47,7 @@ public class Listener implements Runnable, ITableListener {
 	public void run(){
 		for(;;){
 			if (System.currentTimeMillis() - time > 1000){
-				target.setStatus(false);
+				target.setFoundRect(false);
 			}
 		}
 	}

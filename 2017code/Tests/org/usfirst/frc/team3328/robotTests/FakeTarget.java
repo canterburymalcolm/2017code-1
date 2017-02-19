@@ -19,13 +19,13 @@ public class FakeTarget implements Target {
 	}
 
 	@Override
-	public void setStatus(boolean stat) {
+	public void setFoundRect(boolean stat) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public boolean getStatus() {
+	public boolean foundTarget() {
 		// TODO Auto-generated method stub
 		return false;
 	}

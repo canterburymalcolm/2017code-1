@@ -6,7 +6,7 @@ import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
 public interface DriveSystem {
 	
-	boolean placingGear();
+	boolean getPlacingGear();
 	
 	ADIS16448_IMU getImu();
 	
@@ -21,8 +21,6 @@ public interface DriveSystem {
 	void stop();
 
 	void autoAngle(double current, double desired);
-	
-	DriveTalons getTalons();
 	
 	void upRestraint();
 	
