@@ -5,7 +5,7 @@ public class SteamWorksTarget implements Target {
 	//private AtomicReference<Double> pixel; 
 	private double pixel;
 	private double distance;
-	private boolean status = false;
+	private boolean targetFound = false;
 	
 	@Override
 	public void setPixel(double pixel){
@@ -31,18 +31,18 @@ public class SteamWorksTarget implements Target {
 	}
 	
 	@Override
-	public void setStatus(boolean status){
-		this.status = status;
+	public void setFoundRect(boolean targetFound){
+		this.targetFound = targetFound;
 	}
 	
 	@Override
-	public boolean getStatus(){
-		return status;
+	public boolean foundTarget(){
+		return targetFound;
 	}
 	
 	
 	@Override
 	public void printValues(){
-		System.out.printf("Pixel: %06.2f| Distance: %06.2f| Status: %b\n", getPixel(), getDistance(), getStatus());
+		System.out.printf("Pixel: %06.2f| Distance: %06.2f| Status: %b\n", getPixel(), getDistance(), foundTarget());
 	}
 }

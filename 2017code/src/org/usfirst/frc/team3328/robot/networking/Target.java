@@ -10,9 +10,9 @@ public interface Target {
 
 	double getDistance();
 
-	void setStatus(boolean stat);
+	void setFoundRect(boolean stat);
 
-	boolean getStatus();
+	boolean foundTarget();
 
 	void printValues();
 

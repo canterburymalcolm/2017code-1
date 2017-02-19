@@ -74,13 +74,4 @@ public class Teleop {
 	public Climber getClimber(){
 		return climb;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }

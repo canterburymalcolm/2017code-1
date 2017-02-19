@@ -6,49 +6,45 @@ import org.junit.Test;
 import org.usfirst.frc.team3328.robot.utilities.PID;
 import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
+import edu.wpi.first.wpilibj.Relay;
+
 public class TrackingTest {
 	
 	boolean state;
 	double store;
 	FakeController con = new FakeController();
 	FakeTarget target = new FakeTarget();
-	PID pid = new PID("TrackingTest", 0, 0, 0);
-	Tracking track = new Tracking(target, pid);
+	PID pidAngle = new PID(0, 0, 0);
+	PID pidMovement = new PID(0, 0, 0);
+	Tracking track = new Tracking(target, new Relay(0), pidAngle, pidMovement);
 	
 	@Test
-	public void isTracking_pixelWithinDeadZone_returnsFalse(){
-		target.setPixel(track.getGoal());
-		track.isTracking();
-		//assertTrue(track.getTracking());
+	public void updateTracking_pixelWithinDeadZone_returnsFalse(){
+		target.setPixel(320);
+		track.updateTracking();
+		assertTrue(!track.getTracking());
 	}
 	
 	@Test
-	public void isTracking_lBumpReleased_togglesTracking(){
-		//state = track.getTracking();
-		con.setlBump(true);
-		//assertTrue(track.getTracking() != state);
+	public void getTurn_pixelWithinDeadZone_turnSpeedSetToZero(){
+		target.setPixel(320);
+		assertTrue(track.getTurn() == 0);
 	}
 	
 	@Test
-	public void track_pixelWithinDeadZone_trackSpeedSetToZero(){
-		target.setPixel(track.getGoal());
-		assertTrue(track.track() == 0);
-	}
-	
-	@Test
-	public void track_twoDifferentErrorLengths_largerErrorCorrectsFaster(){
+	public void getTurn_twoDifferentErrorLengths_largerErrorCorrectsFaster(){
 		target.setPixel(300);
-		store = track.track();
+		store = track.getTurn();
 		target.setPixel(250);
-		assertTrue(track.track() > store);
+		assertTrue(track.getTurn() > store);
 	}
 	
 	@Test
-	public void track_inverseErrors_inverseCorrection(){
+	public void getTurn_inverseErrors_inverseCorrection(){
 		target.setPixel(220);
-		store = track.track();
+		store = track.getTurn();
 		target.setPixel(420);
-		assertTrue(track.track() + store == 0);
+		assertTrue(track.getTurn() + store == 0);
 	}
 	
 	
