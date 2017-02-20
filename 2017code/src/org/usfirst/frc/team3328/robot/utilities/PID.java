@@ -49,7 +49,6 @@ public class PID {
 	
 	public void setError(double error){
 		this.error = error;
-		this.error /= 360;
 		if (firstTime){
 			prevError = error;
 			firstTime = false;
@@ -69,8 +68,8 @@ public class PID {
 		
 		deltaError = (prevError - error) / timeChange;
 		
-		integralError += (error * timeChange);
-		System.out.println(integralError);
+		integralError += (error * .1);
+		System.out.println(error);
 		
 		pOut = error * KP;
 		iOut = integralError * KI;
