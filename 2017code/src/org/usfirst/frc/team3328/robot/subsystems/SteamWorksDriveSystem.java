@@ -52,8 +52,9 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	
 	@Override
 	public void move(double left, double right){
-		talons.right(right);
+		talons.right(right * .75);
 		talons.left(left);
+		printSpeed();
 	}
 	
 	public double calculateSpeed(double position){
@@ -91,7 +92,7 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	}
 	
 	public void updateAngleSpeed(){
-		pid.setError(displacement);
+		pid.setError(displacement / 360);
 		angleSpeed = pid.getCorrection();
 	}
 	

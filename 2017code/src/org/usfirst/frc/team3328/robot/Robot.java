@@ -37,7 +37,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		xbox = new SteamWorksXbox(1);
-		pid = new PID(1.5 ,0, 0);
+		pid = new PID(3.0 ,0, 0);
 		telop = new Teleop(
 				new SteamWorksDriveSystem(
 					new DriveEncoders(
@@ -120,10 +120,10 @@ public class Robot extends IterativeRobot {
 			}
 		}
 		if (autoActive){
-			pid.reset();
 			auto.run();
 		}else{
 			auto.reset();
+			pid.reset();
 		}
 	}
 }
