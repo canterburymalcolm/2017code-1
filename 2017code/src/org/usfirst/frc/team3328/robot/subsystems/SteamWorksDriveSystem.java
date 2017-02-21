@@ -52,19 +52,14 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	
 	@Override
 	public void move(double left, double right){
-		talons.right(right * .75);
+		talons.right(right);
 		talons.left(left);
 		printSpeed();
 	}
 	
 	public double calculateSpeed(double position){
-		if (position >= 0){
-			return (Math.sin(position - (Math.PI / 2)) + 1) * 2; 
-		}else{
-			position *= -1;
-			position = (Math.sin(position - (Math.PI / 2)) + 1) * 2;
-			return position *= -1;
-		}
+		double newPosition = (Math.sin(Math.abs(position) - (Math.PI / 2)) + 1) * 2; 
+		return (newPosition * Math.signum(position));
 	}
 	
 	@Override
