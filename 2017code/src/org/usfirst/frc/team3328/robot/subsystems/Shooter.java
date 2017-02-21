@@ -12,6 +12,8 @@ public interface Shooter {
 	
 	void stop();
 	
+	void toggleBelt();
+	
 	void toggleShooter();
 	
 	void shooterControl();
