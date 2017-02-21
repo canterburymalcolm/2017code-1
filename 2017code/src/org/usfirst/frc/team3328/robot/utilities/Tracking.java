@@ -15,10 +15,11 @@ public class Tracking {
 	private double pixel;
 	private double distance;
 	private double move = 0;
+	private double turn = 0;
 	private double pixelGoal = 320;
-	private double distanceGoal = 100;
+	private double distanceGoal = 130;
 	private double pixelDeadZone = 2;
-	private double distanceDeadZone = 5;
+	private double distanceDeadZone = 3;
 	private boolean tracking = false;
 	
 	public Tracking(Target target, Relay spike, PID pidAngle, PID pidDistance){
@@ -33,17 +34,20 @@ public class Tracking {
 	}
 		
 	public void toggleTracking(){
-		tracking = !tracking;
 		if (tracking){
-			spike.set(Value.kForward);
+			stopTracking();
 		}else{
-			spike.set(Value.kOff);
+			tracking = true;
+			spike.set(Value.kForward);
 		}
+		
 	}
 	
 	public void stopTracking(){
 		tracking = false;
 		spike.set(Value.kOff);
+		pidAngle.reset();
+		pidDistance.reset();
 	}
 	
 	public void updateTracking(){
@@ -52,9 +56,10 @@ public class Tracking {
 		double pixelDisplacement = Math.abs(pixel - pixelGoal);
 		double moveDisplacement = Math.abs(distance - distanceGoal);
 		if (target.foundTarget()){
+			turn = updateTurn(pixel - pixelGoal);
 			if (pixelDisplacement < pixelDeadZone){
 				move = updateMove(distance - distanceGoal);
-				if (moveDisplacement < distanceDeadZone){
+				if (moveDisplacement < distanceDeadZone && move < .1){
 					move = 0;
 					stopTracking();
 				}
@@ -62,7 +67,8 @@ public class Tracking {
 				move = 0;
 			}
 		}else{
-			stopTracking();
+			turn = 0;
+			move = 0;
 		}
 	}
 	
@@ -74,7 +80,7 @@ public class Tracking {
 	}	
 
 	public double updateMove(double error) {
-		pidDistance.setError(error);
+		pidDistance.setError(-error / 300);
 		return pidDistance.getCorrection();
 	}
 	
@@ -83,12 +89,12 @@ public class Tracking {
 	}
 	
 	public double updateTurn(double error){
-		pidAngle.setError(error);
+		pidAngle.setError(error / 320);
 		return pidAngle.getCorrection();
 	}
 	
 	public double getTurn(){
-		return updateTurn(pixel - pixelGoal);
+		return turn;
 	}
 	
 }
