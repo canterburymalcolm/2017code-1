@@ -4,7 +4,7 @@ public class NetworkTablesTargetProvider implements TargetProvider{
 	
 	Target target = new SteamWorksTarget();
 	
-	//Listener listener = new Listener("listenerThread", target);
+	Listener listener = new Listener("listenerThread", target);
 	
 	@Override
 	public Target getTarget() {
