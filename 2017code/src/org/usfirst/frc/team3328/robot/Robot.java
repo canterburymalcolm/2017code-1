@@ -37,7 +37,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		xbox = new SteamWorksXbox(1);
-		pid = new PID(3.0 ,0, 0);
+		pid = new PID(2.8 ,.12, .22);
 		telop = new Teleop(
 				new SteamWorksDriveSystem(
 					new DriveEncoders(
@@ -51,21 +51,21 @@ public class Robot extends IterativeRobot {
 					new Tracking(
 						new NetworkTablesTargetProvider().getTarget(),
 						new Relay(0),
-						new PID(.5 ,.05 ,0),
-						new PID(0, 0, 0)),
+						new PID(.5 ,.0 ,0),
+						new PID(.7, .04, 0.2)),
 					new ADIS16448_IMU(),
 					pid),
 				new SteamWorksShooter(
 					new Encoder(4,5),
 					new ShooterTalons(
-						new CANTalon(0),  
-						new CANTalon(1)),
+						new CANTalon(1),  
+						new CANTalon(2)),
 						new SteamWorksHotelLobby(
-						new CANTalon(2))),
+							new CANTalon(3))),
 				new SteamWorksFeeder(
-					new CANTalon(3)),
-				new SteamWorksClimber(
 					new Talon(4)),
+				new SteamWorksClimber(
+					new CANTalon(4)),
 				xbox, //util
 				new SteamWorksXbox(0)); //drive
 		auto = new StateMachine(20, telop);
