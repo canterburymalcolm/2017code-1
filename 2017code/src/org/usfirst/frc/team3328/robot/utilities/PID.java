@@ -77,7 +77,7 @@ public class PID {
 		
 		System.out.println("Iout " + iOut);
 		
-		correction = pOut + iOut + dOut;
+		correction = pOut + iOut - dOut;
 		
 		lastTime = now;
 		prevError = error;
