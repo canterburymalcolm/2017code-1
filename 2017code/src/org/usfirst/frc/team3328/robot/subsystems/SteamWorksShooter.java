@@ -35,7 +35,7 @@ public class SteamWorksShooter implements Shooter {
 	
 	@Override
 	public void maxSpeed(){
-		if (speed < .75){
+		if (speed < .65){
 			speed += 0.01;
 		}
 		talons.set(speed);
@@ -50,8 +50,14 @@ public class SteamWorksShooter implements Shooter {
 	}
 	
 	@Override
+	public void toggleBelt(){
+		belt.toggle();
+	}
+	
+	@Override
 	public void toggleShooter(){
 		active = !active;
+		belt.toggle();
 	}
 	
 	@Override
@@ -61,11 +67,8 @@ public class SteamWorksShooter implements Shooter {
 			belt.runBelt();
 		}else{
 			stop();
-			belt.stopBelt();
 		}
 	
 	}
-	
-	
 	
 }
