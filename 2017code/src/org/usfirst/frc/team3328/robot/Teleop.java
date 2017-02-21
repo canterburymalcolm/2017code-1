@@ -50,6 +50,9 @@ public class Teleop {
 		if (utilXbox.getButtonRelease(Buttons.RBUMP)){
 			shoot.toggleShooter();
 		}
+		if (utilXbox.getButtonRelease(Buttons.X) || utilXbox.getButtonRelease(Buttons.Y)){
+			shoot.toggleBelt();
+		}
 		shoot.shooterControl();
 		//feeding
 		if (utilXbox.getButtonRelease(Buttons.A) || utilXbox.getButtonRelease(Buttons.B)){
