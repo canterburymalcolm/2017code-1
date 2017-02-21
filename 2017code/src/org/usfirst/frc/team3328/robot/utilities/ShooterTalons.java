@@ -13,7 +13,6 @@ public class ShooterTalons {
 	}
 
 	public void set(double speed){
-		speed = -speed;
 		t1.set(speed);
 		t2.set(speed);
 	}
