@@ -6,15 +6,17 @@ public interface Shooter {
 	
 	boolean isEmpty();
 	
-	boolean isMax();
+	boolean isShooting();
 	
-	void maxSpeed();
+	void startShoot();
 	
-	void stop();
+	void stopShoot();
 	
-	void toggleBelt();
+	void startLoad();
 	
-	void toggleShooter();
+	void stopLoad();
+	
+	boolean isLoading();
 	
 	void shooterControl();
 

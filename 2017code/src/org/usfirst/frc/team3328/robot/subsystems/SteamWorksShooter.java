@@ -7,15 +7,17 @@ import edu.wpi.first.wpilibj.Encoder;
 public class SteamWorksShooter implements Shooter {
 
 	HotelLobby belt;
+	Agitator agitator;
 	Encoder encoder;
 	ShooterTalons talons;
 	private double speed = 0;
 	boolean active = false;
 	
-	public SteamWorksShooter(Encoder encoder, ShooterTalons talons, HotelLobby belt){
+	public SteamWorksShooter(Encoder encoder, ShooterTalons talons, HotelLobby belt, Agitator agitator){
 		this.encoder = encoder;
 		this.talons = talons;
 		this.belt = belt;
+		this.agitator = agitator;
 	}
 	
 	@Override
@@ -29,12 +31,12 @@ public class SteamWorksShooter implements Shooter {
 	}
 	
 	@Override
-	public boolean isMax(){
+	public boolean isShooting(){
 		return encoder.get() >= 1000;
 	}
 	
 	@Override
-	public void maxSpeed(){
+	public void startShoot(){
 		if (speed < .65){
 			speed += 0.01;
 		}
@@ -42,7 +44,7 @@ public class SteamWorksShooter implements Shooter {
 	}
 	
 	@Override
-	public void stop(){
+	public void stopShoot(){
 		if (speed > 0){
 			speed -= .01;
 		}
@@ -50,25 +52,32 @@ public class SteamWorksShooter implements Shooter {
 	}
 	
 	@Override
-	public void toggleBelt(){
-		belt.toggle();
-	}
-	
-	@Override
-	public void toggleShooter(){
-		active = !active;
-		belt.toggle();
-	}
-	
-	@Override
 	public void shooterControl(){	
 		if (active){
-			maxSpeed();
-			belt.runBelt();
+			startShoot();
+			belt.run();
 		}else{
-			stop();
+			stopShoot();
 		}
 	
 	}
+
+	@Override
+	public void startLoad() {
+		belt.run();
+		agitator.run();
+	}
+
+	@Override
+	public void stopLoad() {
+		belt.stop();
+		agitator.stop();
+	}
+
+	@Override
+	public boolean isLoading() {
+		return belt.isRunning();
+	}
+
 	
 }
