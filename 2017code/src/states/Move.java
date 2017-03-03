@@ -7,6 +7,7 @@ public class Move implements RobotState{
 	DriveSystem drive;
 	double distance = -1;
 	double distanceTraveled = 0;
+	double speed = .4;
 	
 	public Move(DriveSystem dr){
 		drive = dr;
@@ -22,7 +23,7 @@ public class Move implements RobotState{
 	public boolean run() {
 		distanceTraveled = drive.getDistance();
 		if (distanceTraveled < distance){
-			drive.move(.1, .1);
+			drive.move(speed, speed);
 			return false;
 		}
 		drive.stop();
