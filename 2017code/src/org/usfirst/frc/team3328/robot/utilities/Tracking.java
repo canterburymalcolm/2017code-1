@@ -18,7 +18,7 @@ public class Tracking {
 	private double turn = 0;
 	private double pixelGoal = 320;
 	private double distanceGoal = 130;
-	private double pixelDeadZone = 2;
+	private double pixelDeadZone = 25;
 	private double distanceDeadZone = 3;
 	private boolean tracking = false;
 	
@@ -59,7 +59,7 @@ public class Tracking {
 			turn = updateTurn(pixel - pixelGoal);
 			if (pixelDisplacement < pixelDeadZone){
 				move = updateMove(distance - distanceGoal);
-				if (moveDisplacement < distanceDeadZone && move < .1){
+				if (moveDisplacement < distanceDeadZone){
 					move = 0;
 					stopTracking();
 				}
@@ -74,8 +74,8 @@ public class Tracking {
 	
 	public boolean getTracking(){
 		updateTracking();
-		System.out.printf("Status: %b |Tracking: %b |Pixel %f |Distance: %.2f\n", 
-				target.foundTarget(), tracking, pixel, target.getDistance());
+//		System.out.printf("Status: %b |Tracking: %b |Pixel %f |Distance: %.2f\n", 
+//				target.foundTarget(), tracking, pixel, target.getDistance());
 		return tracking;
 	}	
 
