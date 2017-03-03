@@ -17,6 +17,7 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	public double displacement;
 	private double angleSpeed = .08;
 	private double gearSpeed = .1;
+	private double gearDistance;
 	boolean placingGear = false;
 	
 	public SteamWorksDriveSystem(DriveEncoders encoders, DriveTalons talons, 
@@ -47,7 +48,14 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	
 	@Override
 	public double getDistance(){
-		return encoders.getDistance();
+		double dist = encoders.getDistance();
+		System.out.println("Encoder: " + dist);
+		return dist;
+	}
+	
+	@Override
+	public boolean stopped(){
+		return Math.abs(encoders.rightRate()) < 10 && Math.abs(encoders.leftRate()) < 10;
 	}
 	
 	@Override
@@ -98,11 +106,16 @@ public class SteamWorksDriveSystem implements DriveSystem {
 		System.out.printf("Current: %.2f |Desired: %.2f\n", current, desired);
 		move(angleSpeed, -angleSpeed);
 	}
+
+	@Override
+	public void setGearDistance(double gearDistance) {
+		this.gearDistance = gearDistance;
+	}
 	
 	@Override
 	public void placeGear(){
 		placingGear = true;
-		if(encoders.getDistance() > 1){
+		if(encoders.getDistance() < gearDistance){
 			move(gearSpeed, gearSpeed);
 		}else{
 			placingGear = false;

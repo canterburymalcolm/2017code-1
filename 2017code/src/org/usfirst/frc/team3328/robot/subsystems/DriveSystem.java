@@ -16,6 +16,8 @@ public interface DriveSystem {
 	
 	double getDistance();
 	
+	boolean stopped();
+	
 	void printSpeed();
 	
 	void stop();
@@ -28,6 +30,8 @@ public interface DriveSystem {
 	
 	void move(double left, double right);
 	
+	void setGearDistance(double gearDistance);
+
 	void placeGear();
 
 	void controlledMove(double xAxis, double yAxis);
