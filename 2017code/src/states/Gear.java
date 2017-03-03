@@ -12,7 +12,7 @@ public class Gear implements RobotState{
 	
 	@Override
 	public void setValue(double val){
-		
+		drive.setGearDistance(val);
 	}
 	
 	@Override
