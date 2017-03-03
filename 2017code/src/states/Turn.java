@@ -10,7 +10,7 @@ public class Turn implements RobotState{
 	
 	DriveSystem drive;
 	IMU imu;
-	double range = 2;
+	double range = 4.25;
 	double current;
 	double desired;
 	
@@ -40,6 +40,10 @@ public class Turn implements RobotState{
 			drive.autoAngle(current, desired);
 			return false;
 		}
+		if (!drive.stopped()){
+			return false;
+		}
+		drive.stop();
 		return true;
 	}
 }
