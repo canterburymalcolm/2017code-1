@@ -2,10 +2,10 @@ package org.usfirst.frc.team3328.robot.subsystems;
 
 public interface HotelLobby {
 	
-	void toggle();
+	boolean isRunning();
 	
-	void runBelt();
+	void run();
 	
-	void stopBelt();
+	void stop();
 
 }

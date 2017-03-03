@@ -12,18 +12,18 @@ public class SteamWorksHotelLobby implements HotelLobby {
 	}
 	
 	@Override
-	public void toggle(){
-		belt.set((belt.get() == 0) ? beltSpeed : 0);
-	}
-	
-	@Override
-	public void runBelt(){
+	public void run(){
 		belt.set(beltSpeed);
 	}
 	
 	@Override
-	public void stopBelt(){
+	public void stop(){
 		belt.set(0);
+	}
+
+	@Override
+	public boolean isRunning() {
+		return belt.get() > 0;
 	}
 
 }
