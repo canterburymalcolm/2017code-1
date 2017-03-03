@@ -37,18 +37,12 @@ public class SteamWorksShooter implements Shooter {
 	
 	@Override
 	public void startShoot(){
-		if (speed < .65){
-			speed += 0.01;
-		}
 		talons.set(speed);
 		startLoad();
 	}
 	
 	@Override
 	public void stopShoot(){
-		if (speed > 0){
-			speed -= .01;
-		}
 		talons.set(speed);
 		stopLoad();
 	}
