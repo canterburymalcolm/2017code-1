@@ -1,6 +1,8 @@
 package org.usfirst.frc.team3328.robot;
 
 import org.usfirst.frc.team3328.robot.networking.NetworkTablesTargetProvider;
+import org.usfirst.frc.team3328.robot.subsystems.SteamWorksAgitator;
+import org.usfirst.frc.team3328.robot.subsystems.SteamWorksArm;
 import org.usfirst.frc.team3328.robot.subsystems.SteamWorksClimber;
 import org.usfirst.frc.team3328.robot.subsystems.SteamWorksDriveSystem;
 import org.usfirst.frc.team3328.robot.subsystems.SteamWorksFeeder;
@@ -22,8 +24,10 @@ import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Talon;
 import states.StateMachine;
+import states.StateMachine.Modes;
 
 public class Robot extends IterativeRobot {
 	Teleop telop;
@@ -37,7 +41,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		xbox = new SteamWorksXbox(1);
-		pid = new PID(2.8 ,.12, .22);
+		pid = new PID(8 ,0, 1);
 		telop = new Teleop(
 				new SteamWorksDriveSystem(
 					new DriveEncoders(
@@ -51,8 +55,8 @@ public class Robot extends IterativeRobot {
 					new Tracking(
 						new NetworkTablesTargetProvider().getTarget(),
 						new Relay(0),
-						new PID(.5 ,.0 ,0),
-						new PID(.7, .04, 0.2)),
+						new PID(.8 ,.08 ,0),
+						new PID(.6, .03, 0)),
 					new ADIS16448_IMU(),
 					pid),
 				new SteamWorksShooter(
@@ -60,15 +64,19 @@ public class Robot extends IterativeRobot {
 					new ShooterTalons(
 						new CANTalon(1),  
 						new CANTalon(2)),
-						new SteamWorksHotelLobby(
-							new CANTalon(3))),
+					new SteamWorksHotelLobby(
+						new CANTalon(3)),
+					new SteamWorksAgitator(
+						new Relay(1))),
 				new SteamWorksFeeder(
 					new Talon(4)),
 				new SteamWorksClimber(
 					new CANTalon(4)),
+				new SteamWorksArm(
+					new Servo(5)),
 				xbox, //util
 				new SteamWorksXbox(0)); //drive
-		auto = new StateMachine(20, telop);
+		auto = new StateMachine(Modes.CUSTOM2, telop);
 		digit = new REVDigitBoard();
 	}
 
@@ -92,7 +100,21 @@ public class Robot extends IterativeRobot {
 		if (xbox.getButtonRelease(Buttons.A)){
 			autoActive = !autoActive;
 		}
-		if (xbox.getButtonPress(Buttons.LBUMP)){
+		if (xbox.getButtonPress(Buttons.RBUMP)) {
+			if (xbox.getButtonPress(Buttons.X)){
+				pid.adjustP(-.02);
+				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
+			}
+			if (xbox.getButtonPress(Buttons.Y)){
+				pid.adjustI(-.01);
+				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
+			}
+			if (xbox.getButtonPress(Buttons.B)){
+				pid.adjustD(-.02);
+				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
+			}
+		}
+		else if (xbox.getButtonPress(Buttons.LBUMP)){
 			if (xbox.getButtonRelease(Buttons.X)){
 				pid.adjustP(-.02);
 				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
