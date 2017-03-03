@@ -6,6 +6,8 @@ public interface Shooter {
 	
 	boolean isEmpty();
 	
+	boolean isMax();
+	
 	boolean isShooting();
 	
 	void startShoot();
@@ -17,7 +19,5 @@ public interface Shooter {
 	void stopLoad();
 	
 	boolean isLoading();
-	
-	void shooterControl();
 
 }
