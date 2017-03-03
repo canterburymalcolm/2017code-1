@@ -32,7 +32,7 @@ public class SteamWorksShooter implements Shooter {
 	
 	@Override
 	public boolean isShooting(){
-		return encoder.get() >= 1000;
+		return encoder.get() > 0;
 	}
 	
 	@Override
@@ -41,6 +41,7 @@ public class SteamWorksShooter implements Shooter {
 			speed += 0.01;
 		}
 		talons.set(speed);
+		startLoad();
 	}
 	
 	@Override
@@ -49,17 +50,7 @@ public class SteamWorksShooter implements Shooter {
 			speed -= .01;
 		}
 		talons.set(speed);
-	}
-	
-	@Override
-	public void shooterControl(){	
-		if (active){
-			startShoot();
-			belt.run();
-		}else{
-			stopShoot();
-		}
-	
+		stopLoad();
 	}
 
 	@Override
@@ -77,6 +68,11 @@ public class SteamWorksShooter implements Shooter {
 	@Override
 	public boolean isLoading() {
 		return belt.isRunning();
+	}
+
+	@Override
+	public boolean isMax() {
+		return encoder.get() > 0;
 	}
 
 	
