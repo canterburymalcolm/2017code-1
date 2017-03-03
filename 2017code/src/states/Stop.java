@@ -21,7 +21,7 @@ public class Stop implements RobotState{
 	@Override
 	public boolean run() {
 		drive.move(0, 0);
-		shooter.stop();
+		shooter.stopShoot();
 		return false;
 	}
 
