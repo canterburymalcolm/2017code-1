@@ -60,7 +60,6 @@ public class Teleop {
 				shoot.startLoad();
 			}
 		}
-		shoot.shooterControl();
 		//feeding
 		if (utilXbox.getButtonRelease(Buttons.A)){
 			feed.controlFeeder();
