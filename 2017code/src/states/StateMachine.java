@@ -26,6 +26,8 @@ public class StateMachine {
 	States state;
 	
 	public enum States {WAIT, TURN, ENCODERTURN, MOVE, TRACKSHOT, SHOOT, TRACKGEAR, GEAR, STOP};
+	public enum Modes {LINELONG, LINEMIDDLE, SHOOTFL, SHOOTFM, SHOOTFR, SHOOTBL, SHOOTBM, SHOOTBR, 
+						GEARFL, GEARFM, GEARFR, GEARBL, GEARBM, GEARBR, CUSTOM1, CUSTOM2, NOTHING};
 	
 	DriveSystem drive;
 	Tracking track;
@@ -48,7 +50,7 @@ public class StateMachine {
 	}}*/;
 
 	
-	List<State> lineStandard = Arrays.asList(
+	List<State> lineLong = Arrays.asList(
 			new State(States.MOVE, LINELONG),
 			new State(States.STOP, 0));
 	List<State> lineMiddle = Arrays.asList(
@@ -115,33 +117,27 @@ public class StateMachine {
 			new State(States.MOVE, GEARlONG),
 			new State(States.TURN, 90),
 			new State(States.MOVE, GEARSHORT),
-			new State(States.TRACKGEAR, 0),
 			new State(States.GEAR, 0));
 	List<State> gearFM = Arrays.asList(
 			new State(States.MOVE, GEARMIDDLE),
-			new State(States.TRACKGEAR, 0),
 			new State(States.GEAR, 0));
 	List<State> gearFR = Arrays.asList(
 			new State(States.MOVE, GEARlONG),
 			new State(States.TURN, -90),
 			new State(States.MOVE, GEARSHORT),
-			new State(States.TRACKGEAR, 0),
 			new State(States.GEAR, 0));
 	List<State> gearBL = Arrays.asList(
 			new State(States.MOVE, GEARlONG),
 			new State(States.TURN, -90),
 			new State(States.MOVE, GEARSHORT),
-			new State(States.TRACKGEAR, 0),
 			new State(States.GEAR, 0));
 	List<State> gearBM = Arrays.asList(
 			new State(States.MOVE, GEARMIDDLE),
-			new State(States.TRACKGEAR, 0),
 			new State(States.GEAR, 0));
 	List<State> gearBR = Arrays.asList(
 			new State(States.MOVE, GEARlONG),
 			new State(States.TURN, 90),
 			new State(States.MOVE, GEARSHORT),
-			new State(States.TRACKGEAR, 0),
 			new State(States.GEAR, 0));
 	List<State> custom1 = Arrays.asList(
 			new State(States.MOVE, 225),
@@ -153,87 +149,68 @@ public class StateMachine {
 			new State(States.MOVE, 225),
 			new State(States.STOP, 0));
 	List<State> custom2 = Arrays.asList(
-			new State(States.MOVE, 450),
-			new State(States.TURN, 355),
-			new State(States.MOVE, 450),
-			new State(States.TURN, 175),
-			new State(States.MOVE, 450),
-			new State(States.TURN, 355),
-			new State(States.STOP, 0));
-	List<State> custom3 = Arrays.asList(
 			new State(States.TURN, 90),
+			new State(States.WAIT, 3),
+			new State(States.TURN, -90),
+			new State(States.WAIT, 3),
+			new State(States.TURN, 180),
 			new State(States.STOP, 0));
 	List<State> nothing = Arrays.asList(
 			new State(States.STOP, 0));
 	
 	List<State> mode;
 	
-	public StateMachine(int input, Teleop teleop){
+	public StateMachine(Modes input, Teleop teleop){
 		switch (input){
-			case 0:
-				mode = lineStandard;
+			case LINELONG:
+				mode = lineLong;
 				break;
-			case 1:
+			case LINEMIDDLE:
 				mode = lineMiddle;
 				break;
-			case 2:
-				mode = lineStandard;
-				break;
-			case 3:
-				mode = lineStandard;
-				break;
-			case 4:
-				mode = lineMiddle;
-				break;
-			case 5:
-				mode = lineStandard;
-				break;
-			case 6:
+			case SHOOTFL:
 				mode = shootFL;
 				break;
-			case 7:
+			case SHOOTFM:
 				mode = shootFM;
 				break;
-			case 8:
+			case SHOOTFR:
 				mode = shootFR;
 				break;
-			case 9:
+			case SHOOTBL:
 				mode = shootBL;
 				break;
-			case 10:
+			case SHOOTBM:
 				mode = shootBM;
 				break;
-			case 11:
+			case SHOOTBR:
 				mode = shootBR;
 				break;
-			case 12:
+			case GEARFL:
 				mode = gearFL;
 				break;
-			case 13:
+			case GEARFM:
 				mode = gearFM;
 				break;
-			case 14:
+			case GEARFR:
 				mode = gearFR;
 				break;
-			case 15:
+			case GEARBL:
 				mode = gearBL;
 				break;
-			case 16:
+			case GEARBM:
 				mode = gearBM;
 				break;
-			case 17:
+			case GEARBR:
 				mode = gearBR;
 				break;
-			case 18:
+			case CUSTOM1:
 				mode = custom1;
 				break;
-			case 19:
+			case CUSTOM2:
 				mode = custom2;
 				break;
-			case 20:
-				mode = custom3;
-				break;
-			case 21:
+			case NOTHING:
 				mode = nothing;
 			default:
 				mode = nothing;
