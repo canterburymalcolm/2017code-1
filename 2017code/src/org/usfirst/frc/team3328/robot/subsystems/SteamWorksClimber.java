@@ -16,12 +16,8 @@ public class SteamWorksClimber implements Climber {
 	}
 	
 	@Override
-	public void controlClimber(double xAxis){
-		if (xAxis > 0){
-			move(xAxis);
-		}else{
-			move(0);
-		}
+	public void controlClimber(double axis){
+		move(axis);
 	}
 	
 }
