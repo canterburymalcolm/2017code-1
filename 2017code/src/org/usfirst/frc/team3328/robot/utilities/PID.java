@@ -69,13 +69,13 @@ public class PID {
 		deltaError = (prevError - error) / timeChange;
 		
 		integralError += (error * .1);
-		System.out.println(error);
+//		System.out.println(error);
 		
 		pOut = error * KP;
 		iOut = integralError * KI;
 		dOut = deltaError * KD;
 		
-		System.out.println("Iout " + iOut);
+//		System.out.println("Iout " + iOut);
 		
 		correction = pOut + iOut - dOut;
 		
