@@ -77,7 +77,7 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	
 	@Override
 	public void printSpeed(){
-		System.out.printf("%.2f || %.2f\n",talons.getfl(), talons.getfr());
+		//System.out.printf("%.2f || %.2f\n",talons.getfl(), talons.getfr());
 	}
 	
 	@Override
@@ -103,7 +103,7 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	public void autoAngle(double current, double desired){
 		displacement = desired - current;
 		updateAngleSpeed();
-		System.out.printf("Current: %.2f |Desired: %.2f\n", current, desired);
+		//System.out.printf("Current: %.2f |Desired: %.2f\n", current, desired);
 		move(angleSpeed, -angleSpeed);
 	}
 
@@ -139,7 +139,7 @@ public class SteamWorksDriveSystem implements DriveSystem {
 	public void controlledMove(double xAxis, double yAxis){
 		double x = calculateSpeed(xAxis);
 		double y = calculateSpeed(yAxis);
-		if (!track.getTracking()){
+		if (!track.getTracking(stopped())){
 			move((x + y) / restraint, 
 				(x - y) / restraint);
 		}else{
