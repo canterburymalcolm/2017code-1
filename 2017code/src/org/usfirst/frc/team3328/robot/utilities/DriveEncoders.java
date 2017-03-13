@@ -10,8 +10,8 @@ public class DriveEncoders {
 	public DriveEncoders(Encoder right, Encoder left){
 		this.right = right;
 		this.left = left;
-		this.right.setReverseDirection(true);
-		this.left.setReverseDirection(false);
+		this.right.setReverseDirection(false);
+		this.left.setReverseDirection(true);
 	}
 	
 	public void reset(){
