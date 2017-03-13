@@ -10,7 +10,7 @@ public class SteamWorksShooter implements Shooter {
 	Agitator agitator;
 	Encoder encoder;
 	ShooterTalons talons;
-	private double speed = 0;
+	private double speed = .65;
 	boolean active = false;
 	
 	public SteamWorksShooter(Encoder encoder, ShooterTalons talons, HotelLobby belt, Agitator agitator){
@@ -32,7 +32,7 @@ public class SteamWorksShooter implements Shooter {
 	
 	@Override
 	public boolean isShooting(){
-		return encoder.get() > 0;
+		return talons.getRate() != 0;
 	}
 	
 	@Override
@@ -43,7 +43,7 @@ public class SteamWorksShooter implements Shooter {
 	
 	@Override
 	public void stopShoot(){
-		talons.set(speed);
+		talons.set(0);
 		stopLoad();
 	}
 
@@ -66,7 +66,8 @@ public class SteamWorksShooter implements Shooter {
 
 	@Override
 	public boolean isMax() {
-		return encoder.get() > 0;
+		System.out.println("rate " + talons.getRate());
+		return talons.getRate() > 0;
 	}
 
 	
