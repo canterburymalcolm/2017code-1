@@ -10,7 +10,7 @@ public class Turn implements RobotState{
 	
 	DriveSystem drive;
 	IMU imu;
-	double range = 4.25;
+	double range = 6;
 	double current;
 	double desired;
 	
