@@ -9,21 +9,27 @@ import org.usfirst.frc.team3328.robot.subsystems.Shooter;
 import org.usfirst.frc.team3328.robot.utilities.IMU;
 import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class StateMachine {
 	
-	private final double LINELONG = 10;
+	private final double LINELONG = 4000;
 	private final double LINESHORT = 3;
 	private final double SHOOTLONG = 10;
-	private final double SHOOTMIDDLE = 5;
+	private final double SHOOTMIDDLE = 500;
 	private final double SHOOTSHORT = 3;
 	private final double GEARlONG = 10;
-	private final double GEARMIDDLE = 5;
+	private final double GEARMIDDLE = -1100;
 	private final double GEARSHORT = 3;
 	
 	int iteration = -1;
 	double value;
 	boolean newState = true;
 	States state;
+	Modes choice;
+	SendableChooser<Modes> chooser;
+
 	
 	public enum States {WAIT, TURN, ENCODERTURN, MOVE, TRACKSHOT, SHOOT, TRACKGEAR, GEAR, STOP};
 	public enum Modes {LINELONG, LINEMIDDLE, SHOOTFL, SHOOTFM, SHOOTFR, SHOOTBL, SHOOTBM, SHOOTBR, 
@@ -81,9 +87,7 @@ public class StateMachine {
 			new State(States.STOP, 0));
 	List<State> shootFR = Arrays.asList(
 			new State(States.MOVE, SHOOTMIDDLE),
-			new State(States.TURN, 90),
-			new State(States.MOVE, SHOOTSHORT),
-			new State(States.TRACKSHOT, 0),
+			new State(States.TURN, 45),
 			new State(States.SHOOT, 0),
 			new State(States.STOP, 0));
 	List<State> shootBL = Arrays.asList(
@@ -120,7 +124,7 @@ public class StateMachine {
 			new State(States.GEAR, 0));
 	List<State> gearFM = Arrays.asList(
 			new State(States.MOVE, GEARMIDDLE),
-			new State(States.GEAR, 0));
+			new State(States.STOP, 0));
 	List<State> gearFR = Arrays.asList(
 			new State(States.MOVE, GEARlONG),
 			new State(States.TURN, -90),
@@ -159,62 +163,11 @@ public class StateMachine {
 			new State(States.STOP, 0));
 	
 	List<State> mode;
+	List<List<State>> modes = Arrays.asList(lineLong, lineMiddle, shootFL, shootFM, shootFR, shootBL, shootBM, shootBR,
+											gearFL, gearFM, gearFR, gearBL, gearBM, gearBR, custom1, custom2, nothing);
 	
-	public StateMachine(Modes input, Teleop teleop){
-		switch (input){
-			case LINELONG:
-				mode = lineLong;
-				break;
-			case LINEMIDDLE:
-				mode = lineMiddle;
-				break;
-			case SHOOTFL:
-				mode = shootFL;
-				break;
-			case SHOOTFM:
-				mode = shootFM;
-				break;
-			case SHOOTFR:
-				mode = shootFR;
-				break;
-			case SHOOTBL:
-				mode = shootBL;
-				break;
-			case SHOOTBM:
-				mode = shootBM;
-				break;
-			case SHOOTBR:
-				mode = shootBR;
-				break;
-			case GEARFL:
-				mode = gearFL;
-				break;
-			case GEARFM:
-				mode = gearFM;
-				break;
-			case GEARFR:
-				mode = gearFR;
-				break;
-			case GEARBL:
-				mode = gearBL;
-				break;
-			case GEARBM:
-				mode = gearBM;
-				break;
-			case GEARBR:
-				mode = gearBR;
-				break;
-			case CUSTOM1:
-				mode = custom1;
-				break;
-			case CUSTOM2:
-				mode = custom2;
-				break;
-			case NOTHING:
-				mode = nothing;
-			default:
-				mode = nothing;
-		}
+	public StateMachine(Teleop teleop, SendableChooser<Modes> chooser_){
+		this.chooser = chooser_;
 		drive = teleop.getDrive();
 		track = drive.getTrack();
 		shooter = teleop.getShooter();
@@ -229,12 +182,43 @@ public class StateMachine {
 		classes.put(States.TRACKGEAR, new TrackGear(drive));
 		classes.put(States.GEAR, new Gear(drive));
 		classes.put(States.STOP, new Stop(drive, shooter));
+		addModes();
+	}
+	
+	public void setMode(){
+		choice = chooser.getSelected();
+		mode = modes.get(choice.ordinal());
+	}
+
+	public List<State> getMode(){
+		return mode;
+	}
+	
+	private void addModes(){
+		chooser.addDefault(Modes.NOTHING.toString(), Modes.NOTHING);
+		chooser.addObject(Modes.LINELONG.toString(), Modes.LINELONG);
+		chooser.addObject(Modes.LINEMIDDLE.toString(), Modes.LINEMIDDLE);
+		chooser.addObject(Modes.SHOOTFL.toString(), Modes.SHOOTFL);
+		chooser.addObject(Modes.SHOOTFM.toString(), Modes.SHOOTFM);	
+		chooser.addObject(Modes.SHOOTFR.toString(), Modes.SHOOTFR);
+		chooser.addObject(Modes.SHOOTBL.toString(), Modes.SHOOTBL);
+		chooser.addObject(Modes.SHOOTBM.toString(), Modes.SHOOTBM);
+		chooser.addObject(Modes.SHOOTBR.toString(), Modes.SHOOTBR);
+		chooser.addObject(Modes.GEARFL.toString(), Modes.GEARFL);
+		chooser.addObject(Modes.GEARFM.toString(), Modes.GEARFM);
+		chooser.addObject(Modes.GEARFR.toString(), Modes.GEARFR);
+		chooser.addObject(Modes.GEARBL.toString(), Modes.GEARBL);
+		chooser.addObject(Modes.GEARBM.toString(), Modes.GEARBM);
+		chooser.addObject(Modes.GEARBR.toString(), Modes.GEARBR);
+		chooser.addObject(Modes.CUSTOM1.toString(), Modes.CUSTOM1);
+		chooser.addObject(Modes.CUSTOM2.toString(), Modes.CUSTOM2);
+		SmartDashboard.putData("Auto choices", chooser);
 	}
 	
 	public void reset(){
-		iteration = -1;
-		drive.stop();
-		newState = true;
+//		iteration = -1;
+//		drive.stop();
+//		newState = true;
 	}
 	
 	public void run(){
