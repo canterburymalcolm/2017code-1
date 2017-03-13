@@ -21,25 +21,33 @@ import org.usfirst.frc.team3328.robot.utilities.SteamWorksXbox.Buttons;
 
 import com.ctre.CANTalon;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import states.StateMachine;
 import states.StateMachine.Modes;
 
 public class Robot extends IterativeRobot {
+	CameraServer stream;
+	UsbCamera usbCam;
 	Teleop telop;
 	StateMachine auto;
 	REVDigitBoard digit;  
 	Controller xbox;
 	PID pid;
 	boolean autoActive = false;
-
-
+	
 	@Override
 	public void robotInit() {
+		stream = CameraServer.getInstance();
+		usbCam = stream.startAutomaticCapture();
 		xbox = new SteamWorksXbox(1);
 		pid = new PID(8 ,0, 1);
 		telop = new Teleop(
@@ -55,8 +63,8 @@ public class Robot extends IterativeRobot {
 					new Tracking(
 						new NetworkTablesTargetProvider().getTarget(),
 						new Relay(0),
-						new PID(.8 ,.08 ,0),
-						new PID(.6, .03, 0)),
+						new PID(.007 ,0 ,1),
+						new PID(.05, 0, 3)),
 					new ADIS16448_IMU(),
 					pid),
 				new SteamWorksShooter(
@@ -76,12 +84,14 @@ public class Robot extends IterativeRobot {
 					new Servo(5)),
 				xbox, //util
 				new SteamWorksXbox(0)); //drive
-		auto = new StateMachine(Modes.CUSTOM2, telop);
+		auto = new StateMachine(telop, new SendableChooser<Modes>());
 		digit = new REVDigitBoard();
 	}
 
 	@Override
 	public void autonomousInit() {
+		auto.setMode();
+		System.out.println("Mode " + auto.getMode());
 		digit.updateButtons();
 	}
 
