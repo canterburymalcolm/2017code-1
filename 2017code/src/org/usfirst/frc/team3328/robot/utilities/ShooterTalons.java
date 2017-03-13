@@ -1,14 +1,17 @@
 package org.usfirst.frc.team3328.robot.utilities;
 
+import com.ctre.CANTalon;
+
 import edu.wpi.first.wpilibj.CANSpeedController;
+import edu.wpi.first.wpilibj.TalonSRX;
 
 public class ShooterTalons {
 	
-	private CANSpeedController t1;
-	private CANSpeedController t2;
+	private CANTalon t1;
+	private CANTalon t2;
 	double rampRate = 6;
 	
-	public ShooterTalons(CANSpeedController t1, CANSpeedController t2){
+	public ShooterTalons(CANTalon t1, CANTalon t2){
 		this.t1 = t1;
 		this.t2 = t2;
 		this.t1.setVoltageRampRate(rampRate);
@@ -23,6 +26,11 @@ public class ShooterTalons {
 	public void stop() {
 		t1.set(0);
 		t2.set(0);
+	}
+	
+	public double getRate(){
+		System.out.println("vel " + t1.getAnalogInVelocity());
+		return t1.get();
 	}
 	
 }
