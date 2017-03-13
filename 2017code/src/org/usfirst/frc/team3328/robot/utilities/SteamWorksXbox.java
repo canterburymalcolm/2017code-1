@@ -25,6 +25,16 @@ public class SteamWorksXbox implements Controller {
 	}
 	
 	@Override
+	public double getRightTrigger(){
+		return xbox.getRawAxis(3);
+	}
+	
+	@Override
+	public double getLeftTrigger(){
+		return xbox.getRawAxis(2);
+	}
+	
+	@Override
 	public double getY(){
 		if (Math.abs(xbox.getRawAxis(0)) > .15){
 			return xbox.getRawAxis(0);

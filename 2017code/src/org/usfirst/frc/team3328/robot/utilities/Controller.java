@@ -11,7 +11,11 @@ public interface Controller {
 	//returns the y axis for the joystick
 	//returns the x axis for the xbox with a deadband of .1
 	double getY();
-
+	
+	double getRightTrigger();
+	
+	double getLeftTrigger();
+	
 	//returns true when the button with the index "num" has been released
 	boolean getButtonRelease(Buttons but);
 

@@ -47,5 +47,17 @@ public class SteamWorksJoystick implements Controller {
 		return joy.getRawButton(num);
 	}
 
+	@Override
+	public double getRightTrigger() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getLeftTrigger() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 	
 }
