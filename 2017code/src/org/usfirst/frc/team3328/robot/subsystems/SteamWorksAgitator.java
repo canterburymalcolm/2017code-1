@@ -13,7 +13,7 @@ public class SteamWorksAgitator implements Agitator {
 
 	@Override
 	public void run() {
-		relay.set(Value.kForward);
+		relay.set(Value.kReverse);
 	}
 
 	@Override

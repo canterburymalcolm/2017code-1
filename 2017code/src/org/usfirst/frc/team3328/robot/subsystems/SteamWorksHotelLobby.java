@@ -23,7 +23,7 @@ public class SteamWorksHotelLobby implements HotelLobby {
 
 	@Override
 	public boolean isRunning() {
-		return belt.get() > 0;
+		return belt.get() != 0;
 	}
 
 }
