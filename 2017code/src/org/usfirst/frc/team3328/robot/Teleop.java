@@ -9,6 +9,8 @@ import org.usfirst.frc.team3328.robot.utilities.Controller;
 import org.usfirst.frc.team3328.robot.utilities.SteamWorksXbox.Buttons;
 import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class Teleop {
 	
 	DriveSystem drive;
@@ -53,7 +55,7 @@ public class Teleop {
 				shoot.startShoot();
 			}
 		}
-		if (utilXbox.getButtonRelease(Buttons.X) || utilXbox.getButtonRelease(Buttons.Y)){
+		if (utilXbox.getButtonRelease(Buttons.X)){
 			if (shoot.isLoading()){
 				shoot.stopLoad();
 			}else{
@@ -61,11 +63,11 @@ public class Teleop {
 			}
 		}
 		//feeding
-		if (utilXbox.getButtonRelease(Buttons.A)){
+		if (utilXbox.getButtonRelease(Buttons.B) || utilXbox.getButtonRelease(Buttons.Y)){
 			feed.controlFeeder();
 		}
 		//Extending
-		if(utilXbox.getButtonRelease(Buttons.B)){
+		if(utilXbox.getButtonRelease(Buttons.A)){
 			if (arm.isExtended()){
 				arm.rectract();
 			}else{
@@ -73,7 +75,11 @@ public class Teleop {
 			}
 		}
 		//climbing
-		climb.controlClimber(utilXbox.getX());
+		if (utilXbox.getButtonPress(Buttons.LBUMP)){
+			climb.controlClimber(-utilXbox.getLeftTrigger());
+		}else {
+			climb.controlClimber(utilXbox.getRightTrigger());
+		}
 	}
 	
 	public DriveSystem getDrive(){
