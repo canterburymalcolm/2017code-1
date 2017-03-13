@@ -7,7 +7,9 @@ public class Move implements RobotState{
 	DriveSystem drive;
 	double distance = -1;
 	double distanceTraveled = 0;
-	double speed = .4;
+	double speed = .3;
+	double restraint = .82;
+	boolean backwards = false;
 	
 	public Move(DriveSystem dr){
 		drive = dr;
@@ -16,14 +18,24 @@ public class Move implements RobotState{
 	@Override
 	public void setValue(double value) {
 		distance = value;
+		if (distance < 0){
+			backwards = true;
+		}else{
+			backwards = false;
+		}
 		drive.resetDistance();
 	}
 	
 	@Override
 	public boolean run() {
 		distanceTraveled = drive.getDistance();
-		if (distanceTraveled < distance){
-			drive.move(speed, speed);
+		if(backwards){
+			if (distanceTraveled > distance){
+				drive.move(-speed, -speed * restraint);
+				return false;
+			}
+		}else if (distanceTraveled < distance){
+			drive.move(speed, speed * restraint);
 			return false;
 		}
 		drive.stop();
