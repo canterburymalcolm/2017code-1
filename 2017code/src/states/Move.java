@@ -8,7 +8,7 @@ public class Move implements RobotState{
 	double distance = -1;
 	double distanceTraveled = 0;
 	double speed = .3;
-	double restraint = .82;
+	double restraint = 1;
 	boolean backwards = false;
 	
 	public Move(DriveSystem dr){
