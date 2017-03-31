@@ -26,10 +26,13 @@ public class Tracking {
 	private double move = 0;
 	private double turn = 0;
 	private double pixelGoal = 290;
-	private double distanceGoal = 130;
-	private double pixelDeadZone = 25;
-	private double distanceDeadZone = 3;
+	private double distanceGoal = 140;
+	private double pixelDeadZone = 50;
+	private double distanceDeadZone = 10;
 	private boolean tracking = false;
+	private boolean moving = false;
+	private boolean turning = false;
+	private boolean started = false;
 	
 	
 	public Tracking(Target target, Relay spike, PID pidAngle, PID pidDistance){
@@ -37,6 +40,7 @@ public class Tracking {
 		this.pidAngle = pidAngle;
 		this.pidDistance = pidDistance;
 		this.spike = spike;
+		SmartDashboard.putBoolean("tracking", tracking);
 	}
 	
 	public void setGoal(int target){
@@ -48,7 +52,9 @@ public class Tracking {
 			stopTracking();
 		}else{
 			tracking = true;
+			moving = true;
 			spike.set(Value.kForward);
+			SmartDashboard.putBoolean("tracking", tracking);
 		}
 //		if (spike.get() == Value.kOff){
 //			spike.set(Value.kForward);
@@ -58,9 +64,28 @@ public class Tracking {
 		
 	}
 	
+	public void toggleMove(){
+		tracking = !tracking;
+		turning = !turning;
+	}
+	
+	public void toggleTurn(){
+		tracking = !tracking;
+		moving = !moving;
+	}
+	
+	public void toggleLight(){
+		if (spike.get() == Value.kForward){
+			spike.set(Value.kOff);
+		}else{
+			spike.set(Value.kForward);
+		}
+	}
+	
 	public void stopTracking(){
 		tracking = false;
-		spike.set(Value.kOff);
+		SmartDashboard.putBoolean("tracking", tracking);
+		//spike.set(Value.kOff);
 		pidAngle.reset();
 		pidDistance.reset();
 	}
@@ -70,27 +95,50 @@ public class Tracking {
 		distance = target.getDistance();
 		double pixelDisplacement = Math.abs(pixel - pixelGoal);
 		double distanceDisplacement = Math.abs(distance - distanceGoal);
-		if (target.foundTarget() && iteration < 3){
-			stage = stages.get(iteration);
-			if (stage == Stages.TRACK){
-				turn = updateTurn(pixel - pixelGoal);
-				move = 0;
-				if (pixelDisplacement < pixelDeadZone && stopped){
-					iteration++;
-					if (iteration == 3){
-						stopTracking();
-					}
-				}
-			}else if (stage == Stages.MOVE){
-				move = updateMove(distance - distanceGoal);
-				turn = 0;
-				if (distanceDisplacement < distanceDeadZone && stopped){
-					iteration++;
+//		if (target.foundTarget() && iteration < 3){
+//			stage = stages.get(iteration);
+//			if (stage == Stages.TRACK){
+//				turn = updateTurn(pixel - pixelGoal);
+//				move = 0;
+//				if (pixelDisplacement < pixelDeadZone && stopped){
+//					iteration++;
+//					if (iteration == 3){
+//						stopTracking();
+//					}
+//				}
+//			}else if (stage == Stages.MOVE){
+//				move = updateMove(distance - distanceGoal);
+//				turn = 0;
+//				if (distanceDisplacement < distanceDeadZone && stopped){
+//					iteration++;
+//				}
+//			}
+			//System.out.println("pixel " + pixel);
+			if (moving){
+				if (distanceDisplacement > distanceDeadZone){
+					started = true;
+					move = updateMove(distance - distanceGoal);
+				}else if (true){
+					moving = false;
+					//tracking = false;
+					move = 0;
+					started = false;
+					turning = true;
 				}
 			}
-//			System.out.println("pixel " + pixel);
-			//SmartDashboard.putNumber("pixel", pixel);
-//			if (pixelDisplacement > pixelDeadZone && distanceDisplacement > distanceDeadZone && !stopped){
+			if (turning){
+				if (pixelDisplacement > pixelDeadZone){
+					started = true;
+					turn = updateTurn(pixel - pixelGoal);
+				}else if (true){
+					tracking = false;
+					turning = false;
+					turn = 0;
+					started = false;
+				}
+			}
+//			SmartDashboard.putNumber("pixel", pixel);
+//			if (pixelDisplacement > pixelDeadZone && distanceDisplacement > distanceDeadZone){
 //				turn = updateTurn(pixel - pixelGoal);
 //				move = updateMove(distance - distanceGoal);
 //			}else{
@@ -98,9 +146,9 @@ public class Tracking {
 //				move = 0;
 //				stopTracking();
 //			}
-		}else{
-			iteration = 0;
-		}
+//		}else{
+//			iteration = 0;
+//		}
 	}
 	
 	public boolean getTracking(boolean stopped){
@@ -111,8 +159,13 @@ public class Tracking {
 	}	
 
 	public double updateMove(double error) {
-		pidDistance.setError(-error);
-		return pidDistance.getCorrection();
+//		pidDistance.setError(-error);
+//		return pidDistance.getCorrection();
+		if (error > 0){
+			return -.2;
+		}else{
+			return .2;
+		}
 	}
 	
 	public double getMove(){
@@ -120,8 +173,13 @@ public class Tracking {
 	}
 	
 	public double updateTurn(double error){
-		pidAngle.setError(error);
-		return pidAngle.getCorrection();
+//		pidAngle.setError(error);
+//		return pidAngle.getCorrection();
+		if (error > 0){
+			return .26;
+		}else{
+			return -.26;
+		}
 	}
 	
 	public double getTurn(){
