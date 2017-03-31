@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 public class SteamWorksHotelLobby implements HotelLobby {
 	
 	SpeedController belt;
-	double beltSpeed = -.5;
+	double beltSpeed = -.4;
 	
 	public SteamWorksHotelLobby(SpeedController belt) {
 		this.belt = belt;
