@@ -1,12 +1,20 @@
 package states;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 import org.usfirst.frc.team3328.robot.Teleop;
 import org.usfirst.frc.team3328.robot.subsystems.DriveSystem;
 import org.usfirst.frc.team3328.robot.subsystems.HotelLobby;
 import org.usfirst.frc.team3328.robot.subsystems.Shooter;
+import org.usfirst.frc.team3328.robot.utilities.Controller;
 import org.usfirst.frc.team3328.robot.utilities.IMU;
+import org.usfirst.frc.team3328.robot.utilities.SteamWorksXbox.Buttons;
 import org.usfirst.frc.team3328.robot.utilities.Tracking;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -14,27 +22,32 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class StateMachine {
 	
-	private final double LINELONG = 4000;
-	private final double LINESHORT = 3;
-	private final double SHOOTLONG = 10;
-	private final double SHOOTMIDDLE = 500;
-	private final double SHOOTSHORT = 3;
-	private final double GEARlONG = 10;
-	private final double GEARMIDDLE = -1100;
-	private final double GEARSHORT = 3;
+	Constant linelong = new Constant("linelong", 340);
+	Constant lineshort = new Constant("lineshort", 1000);
+	Constant shootlong = new Constant("shootlong", 800);
+	Constant shootmiddle = new Constant("shootmiddle", 4000);
+	Constant shootshort = new Constant("shootshort", 4000);
+	Constant gearlong = new Constant("gearlong", 4000);
+	Constant gearmiddle = new Constant("gearmiddle", 4000);
+	Constant gearshort = new Constant("gearshort", 4000);
 	
 	int iteration = -1;
+	int constant = 0;
 	double value;
 	boolean newState = true;
 	States state;
 	Modes choice;
 	SendableChooser<Modes> chooser;
+	Constant[] constants = new Constant[]{linelong, lineshort, shootlong, shootmiddle, shootshort, gearlong, gearmiddle, gearshort};
+	//File stateMachineVariables = new File("C:\\Users\\Anton\\Desktop\\StateMachine Constants.txt");
+	
 
 	
 	public enum States {WAIT, TURN, ENCODERTURN, MOVE, TRACKSHOT, SHOOT, TRACKGEAR, GEAR, STOP};
 	public enum Modes {LINELONG, LINEMIDDLE, SHOOTFL, SHOOTFM, SHOOTFR, SHOOTBL, SHOOTBM, SHOOTBR, 
 						GEARFL, GEARFM, GEARFR, GEARBL, GEARBM, GEARBR, CUSTOM1, CUSTOM2, NOTHING};
 	
+	Controller xbox;
 	DriveSystem drive;
 	Tracking track;
 	Shooter shooter;
@@ -57,91 +70,87 @@ public class StateMachine {
 
 	
 	List<State> lineLong = Arrays.asList(
-			new State(States.MOVE, LINELONG),
+			new State(States.MOVE, linelong.value),
 			new State(States.STOP, 0));
 	List<State> lineMiddle = Arrays.asList(
 			new State(States.TURN, 90),
-			new State(States.MOVE, LINESHORT),
+			new State(States.MOVE, lineshort.value),
 			new State(States.TURN, -90),
-			new State(States.MOVE, LINELONG),
+			new State(States.MOVE, linelong.value),
 			new State(States.STOP, 0));
 	List<State> shootFL = Arrays.asList(
-			new State(States.TURN, 90),
-			new State(States.MOVE, SHOOTLONG),
-			new State(States.TURN, -90),
-			new State(States.MOVE, SHOOTMIDDLE),
-			new State(States.TURN, 90),
-			new State(States.MOVE, SHOOTSHORT),
+			new State(States.MOVE, shootlong.value),
+			new State(States.TURN, 40),
 			new State(States.TRACKSHOT, 0),
 			new State(States.SHOOT, 0),
 			new State(States.STOP, 0));
 	List<State> shootFM = Arrays.asList(
 			new State(States.TURN, 90),
-			new State(States.MOVE, SHOOTMIDDLE),
+			new State(States.MOVE, shootmiddle.value),
 			new State(States.TURN, -90),
-			new State(States.MOVE, SHOOTMIDDLE),
+			new State(States.MOVE, shootmiddle.value),
 			new State(States.TURN, 90),
-			new State(States.MOVE, SHOOTSHORT),
+			new State(States.MOVE, shootshort.value),
 			new State(States.TRACKSHOT, 0),
 			new State(States.SHOOT, 0),
 			new State(States.STOP, 0));
 	List<State> shootFR = Arrays.asList(
-			new State(States.MOVE, SHOOTMIDDLE),
+			new State(States.MOVE, shootmiddle.value),
 			new State(States.TURN, 45),
 			new State(States.SHOOT, 0),
 			new State(States.STOP, 0));
 	List<State> shootBL = Arrays.asList(
-			new State(States.MOVE, SHOOTMIDDLE),
+			new State(States.MOVE, shootmiddle.value),
 			new State(States.TURN, 90),
-			new State(States.MOVE, SHOOTSHORT),
+			new State(States.MOVE, shootshort.value),
 			new State(States.TRACKSHOT, 0),
 			new State(States.SHOOT, 0),
 			new State(States.STOP, 0));
 	List<State> shootBM = Arrays.asList(
 			new State(States.TURN, 90),
-			new State(States.MOVE, SHOOTMIDDLE),
+			new State(States.MOVE, shootmiddle.value),
 			new State(States.TURN, -90),
-			new State(States.MOVE, SHOOTMIDDLE),
+			new State(States.MOVE, shootmiddle.value),
 			new State(States.TURN, 90),
-			new State(States.MOVE, SHOOTSHORT),
+			new State(States.MOVE, shootshort.value),
 			new State(States.TRACKSHOT, 0),
 			new State(States.SHOOT, 0),
 			new State(States.STOP, 0));
 	List<State> shootBR = Arrays.asList(
 			new State(States.TURN, 90),
-			new State(States.MOVE, SHOOTLONG),
+			new State(States.MOVE, shootlong.value),
 			new State(States.TURN, -90),
-			new State(States.MOVE, SHOOTMIDDLE),
+			new State(States.MOVE, shootmiddle.value),
 			new State(States.TURN, 90),
-			new State(States.MOVE, SHOOTSHORT),
+			new State(States.MOVE, shootshort.value),
 			new State(States.TRACKSHOT, 0),
 			new State(States.SHOOT, 0),
 			new State(States.STOP, 0));
 	List<State> gearFL = Arrays.asList(
-			new State(States.MOVE, GEARlONG),
+			new State(States.MOVE, gearlong.value),
 			new State(States.TURN, 90),
-			new State(States.MOVE, GEARSHORT),
+			new State(States.MOVE, gearshort.value),
 			new State(States.GEAR, 0));
 	List<State> gearFM = Arrays.asList(
-			new State(States.MOVE, GEARMIDDLE),
+			new State(States.MOVE, gearmiddle.value),
 			new State(States.STOP, 0));
 	List<State> gearFR = Arrays.asList(
-			new State(States.MOVE, GEARlONG),
+			new State(States.MOVE, gearlong.value),
 			new State(States.TURN, -90),
-			new State(States.MOVE, GEARSHORT),
+			new State(States.MOVE, gearshort.value),
 			new State(States.GEAR, 0));
 	List<State> gearBL = Arrays.asList(
-			new State(States.MOVE, GEARlONG),
+			new State(States.MOVE, gearlong.value),
 			new State(States.TURN, -90),
-			new State(States.MOVE, GEARSHORT),
+			new State(States.MOVE, gearshort.value),
 			new State(States.GEAR, 0));
 	List<State> gearBM = Arrays.asList(
-			new State(States.MOVE, GEARMIDDLE),
+			new State(States.MOVE, gearmiddle.value),
 			new State(States.GEAR, 0));
 	List<State> gearBR = Arrays.asList(
-			new State(States.MOVE, GEARlONG),
+			new State(States.MOVE, gearlong.value),
 			new State(States.TURN, 90),
-			new State(States.MOVE, GEARSHORT),
+			new State(States.MOVE, gearshort.value),
 			new State(States.GEAR, 0));
 	List<State> custom1 = Arrays.asList(
 			new State(States.MOVE, 225),
@@ -168,6 +177,7 @@ public class StateMachine {
 	
 	public StateMachine(Teleop teleop, SendableChooser<Modes> chooser_){
 		this.chooser = chooser_;
+		xbox = teleop.getXbox();
 		drive = teleop.getDrive();
 		track = drive.getTrack();
 		shooter = teleop.getShooter();
@@ -184,10 +194,52 @@ public class StateMachine {
 		classes.put(States.STOP, new Stop(drive, shooter));
 		addModes();
 	}
+
+	public void write(File file){
+		try {
+			FileWriter fw = new FileWriter(file);
+			BufferedWriter bw = new BufferedWriter(fw);
+//			bw.write(LINELONG + "\r\n");
+//			bw.write(LINESHORT + "\r\n");
+//			bw.write(SHOOTLONG + "\r\n");
+//			bw.write(SHOOTMIDDLE + "\r\n");
+//			bw.write(SHOOTSHORT + "\r\n");
+//			bw.write(GEARLONG + "\r\n");
+//			bw.write(GEARMIDDLE + "\r\n");
+//			bw.write(GEARSHORT + "\r\n");
+			bw.close();
+			fw.close();
+		}catch(IOException e){
+			System.out.println(e.getStackTrace());
+		}
+		
+	}
+	
+	public void read(File file){
+		try{
+			FileReader fr =  new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+//			LINELONG = Double.parseDouble(br.readLine());	
+//			LINESHORT= Double.parseDouble(br.readLine());	
+//			SHOOTLONG = Double.parseDouble(br.readLine());	
+//			SHOOTMIDDLE = Double.parseDouble(br.readLine());	
+//			SHOOTSHORT = Double.parseDouble(br.readLine());	
+//			GEARLONG = Double.parseDouble(br.readLine());	
+//			GEARMIDDLE = Double.parseDouble(br.readLine());	
+//			GEARSHORT = Double.parseDouble(br.readLine());	
+			fr.close();
+			br.close();
+		}catch(IOException e){
+			System.out.println(e.getStackTrace());
+		}
+	}
+	
+	
 	
 	public void setMode(){
-		choice = chooser.getSelected();
-		mode = modes.get(choice.ordinal());
+		//choice = chooser.getSelected();
+		//mode = modes.get(choice.ordinal());
+		mode = shootFL;
 	}
 
 	public List<State> getMode(){
@@ -216,10 +268,51 @@ public class StateMachine {
 	}
 	
 	public void reset(){
-//		iteration = -1;
-//		drive.stop();
-//		newState = true;
+		System.out.println("resetting");
+		iteration = -1;
+		newState = true;
+		choice = chooser.getSelected();
+		mode = modes.get(choice.ordinal());
 	}
+	
+	
+	public void printConstant(){
+		System.out.printf("%s: %f\n", constants[constant].name, constants[constant].value);
+	}
+	
+	public void updateValues(){
+		if (xbox.getButtonPress(Buttons.A)){
+			if (xbox.getButtonRelease(Buttons.RBUMP)){
+				if (constant == constants.length - 1){
+					constant = 0;
+				}else{
+					constant++;
+				}
+				printConstant();
+			}
+			if (xbox.getButtonRelease(Buttons.LBUMP)){
+				if (constant == 0){
+					constant = constants.length - 1; 
+				}else{
+					constant--;
+				}
+				printConstant();
+			}
+		}else{
+			if (xbox.getButtonRelease(Buttons.RBUMP)){
+				constants[constant].increment();
+				printConstant();
+			}
+			if (xbox.getButtonRelease(Buttons.LBUMP)){
+				constants[constant].decrement();
+				printConstant();
+			}
+		}
+		if (xbox.getButtonRelease(Buttons.B)){
+			reset();
+		}
+	}
+	
 	
 	public void run(){
 		if (newState){
@@ -229,8 +322,21 @@ public class StateMachine {
 			classes.get(state).setValue(value);
 			System.out.printf("State: %s\n", state.toString());
 			newState = false;
+			if (state == States.STOP){
+				for (int i = 0; i < constants.length; i++){
+					if (constant == constants.length - 1){
+						constant = 0;
+					}else{
+						constant++;
+					}
+					printConstant();
+				}
+			}
 		}else {
 			newState = classes.get(state).run();
+			if (state == States.STOP){
+				updateValues();
+			}
 		}
 	}
 }
