@@ -39,15 +39,14 @@ public class Robot extends IterativeRobot {
 	UsbCamera usbCam;
 	Teleop telop;
 	StateMachine auto;
-	REVDigitBoard digit;  
 	Controller xbox;
 	PID pid;
 	boolean autoActive = false;
 	
 	@Override
 	public void robotInit() {
-		stream = CameraServer.getInstance();
-		usbCam = stream.startAutomaticCapture();
+		//stream = CameraServer.getInstance();
+		//usbCam = stream.startAutomaticCapture();
 		xbox = new SteamWorksXbox(1);
 		pid = new PID(8 ,0, 1);
 		telop = new Teleop(
@@ -85,14 +84,14 @@ public class Robot extends IterativeRobot {
 				xbox, //util
 				new SteamWorksXbox(0)); //drive
 		auto = new StateMachine(telop, new SendableChooser<Modes>());
-		digit = new REVDigitBoard();
+		auto.setMode();
+		System.out.println("Mode " + auto.getMode());
 	}
 
 	@Override
 	public void autonomousInit() {
 		auto.setMode();
 		System.out.println("Mode " + auto.getMode());
-		digit.updateButtons();
 	}
 
 	@Override
@@ -107,55 +106,55 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void testPeriodic() {
-		if (xbox.getButtonRelease(Buttons.A)){
-			autoActive = !autoActive;
-		}
-		if (xbox.getButtonPress(Buttons.RBUMP)) {
-			if (xbox.getButtonPress(Buttons.X)){
-				pid.adjustP(-.02);
-				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
-			}
-			if (xbox.getButtonPress(Buttons.Y)){
-				pid.adjustI(-.01);
-				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
-			}
-			if (xbox.getButtonPress(Buttons.B)){
-				pid.adjustD(-.02);
-				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
-			}
-		}
-		else if (xbox.getButtonPress(Buttons.LBUMP)){
-			if (xbox.getButtonRelease(Buttons.X)){
-				pid.adjustP(-.02);
-				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
-			}
-			if (xbox.getButtonRelease(Buttons.Y)){
-				pid.adjustI(-.01);
-				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
-			}
-			if (xbox.getButtonRelease(Buttons.B)){
-				pid.adjustD(-.02);
-				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
-			}
-		}else{
-			if (xbox.getButtonRelease(Buttons.X)){
-				pid.adjustP(.02);
-				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
-			}
-			if (xbox.getButtonRelease(Buttons.Y)){
-				pid.adjustI(.01);
-				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
-			}
-			if (xbox.getButtonRelease(Buttons.B)){
-				pid.adjustD(.02);
-				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
-			}
-		}
-		if (autoActive){
-			auto.run();
-		}else{
-			auto.reset();
-			pid.reset();
-		}
+//		if (xbox.getButtonRelease(Buttons.A)){
+//			autoActive = !autoActive;
+//		}
+//		if (xbox.getButtonPress(Buttons.RBUMP)) {
+//			if (xbox.getButtonPress(Buttons.X)){
+//				pid.adjustP(-.02);
+//				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
+//			}
+//			if (xbox.getButtonPress(Buttons.Y)){
+//				pid.adjustI(-.01);
+//				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
+//			}
+//			if (xbox.getButtonPress(Buttons.B)){
+//				pid.adjustD(-.02);
+//				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
+//			}
+//		}
+//		else if (xbox.getButtonPress(Buttons.LBUMP)){
+//			if (xbox.getButtonRelease(Buttons.X)){
+//				pid.adjustP(-.02);
+//				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
+//			}
+//			if (xbox.getButtonRelease(Buttons.Y)){
+//				pid.adjustI(-.01);
+//				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
+//			}
+//			if (xbox.getButtonRelease(Buttons.B)){
+//				pid.adjustD(-.02);
+//				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
+//			}
+//		}else{
+//			if (xbox.getButtonRelease(Buttons.X)){
+//				pid.adjustP(.02);
+//				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
+//			}
+//			if (xbox.getButtonRelease(Buttons.Y)){
+//				pid.adjustI(.01);
+//				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
+//			}
+//			if (xbox.getButtonRelease(Buttons.B)){
+//				pid.adjustD(.02);
+//				System.out.printf("P: %05.2f|I: %05.2f|D: %05.2f\n", pid.getP(), pid.getI(), pid.getD());
+//			}
+//		}
+//		if (autoActive){
+//			auto.run();
+//		}else{
+//			auto.reset();
+//			pid.reset();
+//		}
 	}
 }
