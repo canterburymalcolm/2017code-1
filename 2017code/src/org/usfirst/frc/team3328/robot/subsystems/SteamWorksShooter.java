@@ -10,7 +10,7 @@ public class SteamWorksShooter implements Shooter {
 	Agitator agitator;
 	Encoder encoder;
 	ShooterTalons talons;
-	private double speed = .65;
+	private double speed = .6;
 	boolean active = false;
 	
 	public SteamWorksShooter(Encoder encoder, ShooterTalons talons, HotelLobby belt, Agitator agitator){
