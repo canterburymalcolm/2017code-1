@@ -16,14 +16,16 @@ public class TrackShot implements RobotState {
 	
 	@Override
 	public void setValue(double value){
-		
+		track.toggleTracking();
 	}
 	
 	@Override
 	public boolean run() {
 		trackSpeed = track.getTurn();
 		if (track.getTracking(true)){
-			drive.move(trackSpeed, -trackSpeed);
+			double turn = track.getTurn();
+			double move = track.getMove();
+			drive.move(turn + move, -turn + move);
 			return false;
 		}
 		drive.stop();
