@@ -35,9 +35,15 @@ public class Teleop {
 	}
 	
 	public void run(){
+		if (driveXbox.getButtonRelease(Buttons.B)){
+			track.toggleLight();
+		}
 		//tracking
 		if (driveXbox.getButtonRelease(Buttons.A)){
-			track.toggleTracking();
+			track.toggleTurn();
+		}
+		if (driveXbox.getButtonRelease(Buttons.X)){
+			track.toggleMove();
 		}
 		//driving
 		if (driveXbox.getButtonRelease(Buttons.LBUMP)){
@@ -96,5 +102,9 @@ public class Teleop {
 	
 	public Climber getClimber(){
 		return climb;
+	}
+	
+	public Controller getXbox(){
+		return utilXbox;
 	}
 }
