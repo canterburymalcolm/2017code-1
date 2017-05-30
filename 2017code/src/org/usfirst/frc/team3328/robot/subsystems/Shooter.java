@@ -10,6 +10,8 @@ public interface Shooter {
 	
 	boolean isShooting();
 	
+	void spinUp();
+	
 	void startShoot();
 	
 	void stopShoot();
@@ -17,6 +19,8 @@ public interface Shooter {
 	void startLoad();
 	
 	void stopLoad();
+	
+	void updateShoot();
 	
 	boolean isLoading();
 

@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class StateMachine {
 	
-	Constant linelong = new Constant("linelong", 340);
+	Constant linelong = new Constant("linelong", 4000);
 	Constant lineshort = new Constant("lineshort", 1000);
 	Constant shootlong = new Constant("shootlong", 800);
 	Constant shootmiddle = new Constant("shootmiddle", 4000);
@@ -43,7 +43,7 @@ public class StateMachine {
 	
 
 	
-	public enum States {WAIT, TURN, ENCODERTURN, MOVE, TRACKSHOT, SHOOT, TRACKGEAR, GEAR, STOP};
+	public enum States {WAIT, TURN, ENCODERTURN, MOVE, SPINMOVE, TRACKSHOT, SHOOT, TRACKGEAR, GEAR, STOP};
 	public enum Modes {LINELONG, LINEMIDDLE, SHOOTFL, SHOOTFM, SHOOTFR, SHOOTBL, SHOOTBM, SHOOTBR, 
 						GEARFL, GEARFM, GEARFR, GEARBL, GEARBM, GEARBR, CUSTOM1, CUSTOM2, NOTHING};
 	
@@ -79,9 +79,8 @@ public class StateMachine {
 			new State(States.MOVE, linelong.value),
 			new State(States.STOP, 0));
 	List<State> shootFL = Arrays.asList(
-			new State(States.MOVE, shootlong.value),
-			new State(States.TURN, 40),
-			new State(States.TRACKSHOT, 0),
+			new State(States.SPINMOVE, shootlong.value * .9),
+			new State(States.TURN, 32),
 			new State(States.SHOOT, 0),
 			new State(States.STOP, 0));
 	List<State> shootFM = Arrays.asList(
@@ -117,13 +116,8 @@ public class StateMachine {
 			new State(States.SHOOT, 0),
 			new State(States.STOP, 0));
 	List<State> shootBR = Arrays.asList(
-			new State(States.TURN, 90),
-			new State(States.MOVE, shootlong.value),
-			new State(States.TURN, -90),
-			new State(States.MOVE, shootmiddle.value),
-			new State(States.TURN, 90),
-			new State(States.MOVE, shootshort.value),
-			new State(States.TRACKSHOT, 0),
+			new State(States.SPINMOVE, shootlong.value * .9),
+			new State(States.TURN, -47),
 			new State(States.SHOOT, 0),
 			new State(States.STOP, 0));
 	List<State> gearFL = Arrays.asList(
@@ -153,14 +147,8 @@ public class StateMachine {
 			new State(States.MOVE, gearshort.value),
 			new State(States.GEAR, 0));
 	List<State> custom1 = Arrays.asList(
-			new State(States.MOVE, 225),
-			new State(States.MOVE, 450),
-			new State(States.MOVE, 450),
-			new State(States.TURN, 175),
-			new State(States.MOVE, 450),
-			new State(States.MOVE, 450),
-			new State(States.MOVE, 225),
-			new State(States.STOP, 0));
+			new State(States.SPINMOVE, 2000),
+			new State(States.SHOOT, 0));
 	List<State> custom2 = Arrays.asList(
 			new State(States.TURN, 90),
 			new State(States.WAIT, 3),
@@ -185,6 +173,7 @@ public class StateMachine {
 		belt = shooter.getBelt();
 		classes.put(States.WAIT,  new Wait());
 		classes.put(States.MOVE, new Move(drive));
+		classes.put(States.SPINMOVE, new SpinMove(drive, shooter));
 		classes.put(States.TURN, new Turn(drive, imu));
 		classes.put(States.ENCODERTURN, new EncoderTurn(drive));
 		classes.put(States.TRACKSHOT, new TrackShot(drive));
@@ -237,9 +226,8 @@ public class StateMachine {
 	
 	
 	public void setMode(){
-		//choice = chooser.getSelected();
-		//mode = modes.get(choice.ordinal());
-		mode = shootFL;
+		choice = chooser.getSelected();
+		mode = modes.get(choice.ordinal());
 	}
 
 	public List<State> getMode(){

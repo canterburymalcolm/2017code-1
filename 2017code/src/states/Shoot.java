@@ -21,8 +21,8 @@ public class Shoot implements RobotState{
 	@Override
 	public boolean run() {
 //		if (!shooter.isEmpty()){
-			shooter.startLoad();
 			shooter.startShoot();
+			shooter.updateShoot();
 			return false;
 //		}
 //		shooter.stopShoot();

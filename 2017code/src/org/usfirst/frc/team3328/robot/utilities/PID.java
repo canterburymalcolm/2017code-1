@@ -78,6 +78,8 @@ public class PID {
 //		System.out.println("Iout " + iOut);
 		
 		correction = pOut + iOut - dOut;
+		correction = Math.signum(correction) * Math.min(Math.abs(correction), .3);
+		System.out.println(correction);
 		
 		lastTime = now;
 		prevError = error;

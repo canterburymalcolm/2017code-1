@@ -3,8 +3,7 @@ package states;
 import org.usfirst.frc.team3328.robot.subsystems.DriveSystem;
 import org.usfirst.frc.team3328.robot.subsystems.Shooter;
 
-public class Move implements RobotState{
-	
+public class SpinMove implements RobotState{
 	DriveSystem drive;
 	Shooter shoot;
 	double distance = -1;
@@ -13,12 +12,14 @@ public class Move implements RobotState{
 	double restraint = 1;
 	boolean backwards = false;
 	
-	public Move(DriveSystem dr){
+	public SpinMove(DriveSystem dr, Shooter shoot){
+		this.shoot = shoot;
 		drive = dr;
 	}
 	
 	@Override
 	public void setValue(double value) {
+		shoot.spinUp();
 		distance = value;
 		if (distance < 0){
 			backwards = true;

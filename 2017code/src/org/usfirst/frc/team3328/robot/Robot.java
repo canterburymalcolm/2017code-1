@@ -45,8 +45,8 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void robotInit() {
-		//stream = CameraServer.getInstance();
-		//usbCam = stream.startAutomaticCapture();
+		stream = CameraServer.getInstance();
+		usbCam = stream.startAutomaticCapture();
 		xbox = new SteamWorksXbox(1);
 		pid = new PID(8 ,0, 1);
 		telop = new Teleop(
@@ -62,15 +62,14 @@ public class Robot extends IterativeRobot {
 					new Tracking(
 						new NetworkTablesTargetProvider().getTarget(),
 						new Relay(0),
-						new PID(.007 ,0 ,1),
+						new PID(.003, 0, 0), //turning
 						new PID(.05, 0, 3)),
 					new ADIS16448_IMU(),
 					pid),
 				new SteamWorksShooter(
 					new Encoder(4,5),
-					new ShooterTalons(
-						new CANTalon(1),  
-						new CANTalon(2)),
+					new CANTalon(1),  
+					new CANTalon(2),
 					new SteamWorksHotelLobby(
 						new CANTalon(3)),
 					new SteamWorksAgitator(
@@ -101,6 +100,7 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void teleopPeriodic() {
+		telop.init();
 		telop.run();
 	}
 

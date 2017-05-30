@@ -21,6 +21,7 @@ public class Teleop {
 	Controller driveXbox;
 	Arm arm;
 	Tracking track;
+	boolean firstTime = true;
 	
 	public Teleop(DriveSystem drive, Shooter shoot, Feeder feed, Climber climb,
 				Arm arm, Controller utilXbox, Controller driveXbox){
@@ -32,6 +33,13 @@ public class Teleop {
 		this.driveXbox = driveXbox;
 		this.arm = arm;
 		this.track = this.drive.getTrack();
+	}
+	
+	public void init(){
+		if (firstTime){
+			shoot.stopShoot();
+		}
+		firstTime = false;
 	}
 	
 	public void run(){
@@ -46,46 +54,51 @@ public class Teleop {
 			track.toggleMove();
 		}
 		//driving
-		if (driveXbox.getButtonRelease(Buttons.LBUMP)){
-			drive.upRestraint();
-		}
-		if (driveXbox.getButtonRelease(Buttons.RBUMP)){
-			drive.downRestraint();
-		}
+//		if (driveXbox.getButtonRelease(Buttons.LBUMP)){
+//			drive.upRestraint();
+//		}
+//		if (driveXbox.getButtonRelease(Buttons.RBUMP)){
+//			drive.downRestraint();
+//		}
 		drive.controlledMove(driveXbox.getX(), driveXbox.getY());
+		if (driveXbox.getButtonRelease(Buttons.LBUMP)){
+			feed.controlFeeder();
+		}
 		//shooting
-		if (utilXbox.getButtonRelease(Buttons.RBUMP)){
+		if (driveXbox.getButtonRelease(Buttons.RBUMP)){
 			if (shoot.isShooting()){
 				shoot.stopShoot();
 			}else{
 				shoot.startShoot();
 			}
 		}
-		if (utilXbox.getButtonRelease(Buttons.X)){
-			if (shoot.isLoading()){
-				shoot.stopLoad();
-			}else{
-				shoot.startLoad();
-			}
-		}
+		shoot.updateShoot();
+		shoot.isMax();
+//		if (utilXbox.getButtonRelease(Buttons.X)){
+//			if (shoot.isLoading()){
+//				shoot.stopLoad();
+//			}else{
+//				shoot.startLoad();
+//			}
+//		}
 		//feeding
-		if (utilXbox.getButtonRelease(Buttons.B) || utilXbox.getButtonRelease(Buttons.Y)){
-			feed.controlFeeder();
-		}
-		//Extending
-		if(utilXbox.getButtonRelease(Buttons.A)){
-			if (arm.isExtended()){
-				arm.rectract();
-			}else{
-				arm.extend();
-			}
-		}
-		//climbing
-		if (utilXbox.getButtonPress(Buttons.LBUMP)){
-			climb.controlClimber(-utilXbox.getLeftTrigger());
-		}else {
-			climb.controlClimber(utilXbox.getRightTrigger());
-		}
+//		if (utilXbox.getButtonRelease(Buttons.B) || utilXbox.getButtonRelease(Buttons.Y)){
+//			feed.controlFeeder();
+//		}
+//		//Extending
+//		if(utilXbox.getButtonRelease(Buttons.A)){
+//			if (arm.isExtended()){
+//				arm.rectract();
+//			}else{
+//				arm.extend();
+//			}
+//		}
+//		//climbing
+//		if (utilXbox.getButtonPress(Buttons.LBUMP)){
+//			climb.controlClimber(-utilXbox.getLeftTrigger());
+//		}else {
+//			climb.controlClimber(utilXbox.getRightTrigger());
+//		}
 	}
 	
 	public DriveSystem getDrive(){

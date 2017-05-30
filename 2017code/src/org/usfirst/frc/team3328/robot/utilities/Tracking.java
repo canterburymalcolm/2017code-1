@@ -27,7 +27,7 @@ public class Tracking {
 	private double turn = 0;
 	private double pixelGoal = 290;
 	private double distanceGoal = 140;
-	private double pixelDeadZone = 50;
+	private double pixelDeadZone = 25;
 	private double distanceDeadZone = 10;
 	private boolean tracking = false;
 	private boolean moving = false;
@@ -120,10 +120,10 @@ public class Tracking {
 					move = updateMove(distance - distanceGoal);
 				}else if (true){
 					moving = false;
-					//tracking = false;
+					tracking = false;
 					move = 0;
 					started = false;
-					turning = true;
+					//turning = true;
 				}
 			}
 			if (turning){
@@ -176,9 +176,9 @@ public class Tracking {
 //		pidAngle.setError(error);
 //		return pidAngle.getCorrection();
 		if (error > 0){
-			return .26;
+			return .22;
 		}else{
-			return -.26;
+			return -.22;
 		}
 	}
 	
